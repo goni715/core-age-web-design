@@ -1,15 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Mail, ShieldCheck, ArrowLeft } from "lucide-react";
 import AuthSidebar from "@/components/auth/AuthSidebar";
 
 export default function ForgotPasswordPage() {
+  const router = useRouter();
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate sending recovery email
-    alert("If this email exists, a reset link will be sent.");
+    router.push("/verify-otp");
   };
 
   return (
@@ -47,18 +50,18 @@ export default function ForgotPasswordPage() {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <input 
+                  <Input 
                     type="text" 
                     required
                     placeholder="Enter your email or phone number" 
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-700 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-6 rounded-xl border-slate-200 focus-visible:ring-blue-100 focus-visible:border-blue-500 text-sm text-slate-700 placeholder:text-slate-400"
                   />
                 </div>
               </div>
 
               {/* Submit Button */}
               <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-6 rounded-xl shadow-md shadow-primary/20 mt-2">
-                Send Reset Link
+                Continue
               </Button>
 
               {/* Back to Login Link */}

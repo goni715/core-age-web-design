@@ -94,20 +94,20 @@ export default function KycSubmission() {
         <div className="w-full text-left">
           <h4 className="text-sm font-semibold text-slate-700 mb-3">Select Identity Document</h4>
           <div className="grid grid-cols-2 gap-4 mb-8">
-            <button
+            <Button
               onClick={() => setDocType("nid")}
               className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${docType === "nid" ? "border-blue-500 bg-blue-50 text-blue-700 font-semibold" : "border-slate-200 text-slate-600 hover:bg-slate-50 font-medium"}`}
             >
               <CreditCard className="w-6 h-6" />
               <span className="text-sm">National ID (NID)</span>
-            </button>
-            <button
+            </Button>
+            <Button
               onClick={() => setDocType("passport")}
               className={`p-4 rounded-xl border flex flex-col items-center justify-center gap-2 transition-all ${docType === "passport" ? "border-blue-500 bg-blue-50 text-blue-700 font-semibold" : "border-slate-200 text-slate-600 hover:bg-slate-50 font-medium"}`}
             >
               <BookOpen className="w-6 h-6" />
               <span className="text-sm">Passport</span>
-            </button>
+            </Button>
           </div>
 
           <h4 className="text-sm font-semibold text-slate-700 mb-4">Upload Documents</h4>

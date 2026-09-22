@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { ShieldCheck, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import { FaApple } from "react-icons/fa";
@@ -53,10 +54,10 @@ export default function LoginPage() {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                     <Mail className="w-4 h-4" />
                   </div>
-                  <input 
+                  <Input 
                     type="text" 
                     placeholder="Enter your email or phone number" 
-                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-700 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-4 py-6 rounded-xl border-slate-200 focus-visible:ring-blue-100 focus-visible:border-blue-500 text-sm text-slate-700 placeholder:text-slate-400"
                   />
                 </div>
               </div>
@@ -68,14 +69,14 @@ export default function LoginPage() {
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
                     <Lock className="w-4 h-4" />
                   </div>
-                  <input 
+                  <Input 
                     type={showPassword ? "text" : "password"} 
                     placeholder="Enter your password" 
-                    className="w-full pl-10 pr-12 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-700 placeholder:text-slate-400"
+                    className="w-full pl-10 pr-12 py-6 rounded-xl border-slate-200 focus-visible:ring-blue-100 focus-visible:border-blue-500 text-sm text-slate-700 placeholder:text-slate-400"
                   />
                   <button 
                     type="button" 
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                    className="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 hover:text-slate-600 outline-none"
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}

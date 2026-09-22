@@ -56,17 +56,18 @@ export default function PatientsPage() {
       <Card className="p-2 mb-6 border-none shadow-sm rounded-2xl bg-white shrink-0 overflow-x-auto custom-scrollbar">
         <div className="flex items-center min-w-max p-2 gap-1 sm:gap-2">
           {tabs.map(tab => (
-            <button
+            <Button
               key={tab}
+              variant={activeTab === tab ? "default" : "ghost"}
               onClick={() => setActiveTab(tab)}
               className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === tab 
-                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200" 
+                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200 hover:bg-[#2270c9]" 
                   : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
       </Card>

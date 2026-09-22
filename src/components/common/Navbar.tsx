@@ -27,24 +27,18 @@ export default function Navbar() {
 
         {/* Action Buttons (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
-          {/* <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-            Doctor Login
-          </Button> */}
           <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
             <Link href="/login">Login</Link>
           </Button>
-          {/* <Button variant="ghost" className="text-blue-600 hover:bg-blue-50" asChild>
-            <Link href="/login">Login</Link>
-          </Button> */}
 
         </div>
 
         {/* Mobile Menu Toggle */}
         <div className="flex md:hidden items-center gap-3">
 
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="text-slate-600 hover:bg-slate-100 hover:text-blue-600"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
           >
@@ -59,8 +53,8 @@ export default function Navbar() {
 
           <div className="flex flex-col gap-3 pt-2">
             <Link href="/login">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="w-full text-blue-600 border-blue-600 hover:bg-blue-50 justify-center"
                 onClick={() => setIsMobileMenuOpen(false)}
               >

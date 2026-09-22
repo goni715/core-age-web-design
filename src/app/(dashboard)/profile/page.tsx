@@ -5,9 +5,11 @@ import { Camera, TrendingUp, CheckCircle2, Phone, Mail, MapPin, Edit, FileText, 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 export default function AgentProfilePage() {
   const [activeTab, setActiveTab] = useState<"Profile" | "Edit Profile" | "Documents" | "Settings">("Profile");
+  const router = useRouter();
 
   return (
     <div className="max-w-5xl mx-auto flex flex-col h-full">
@@ -20,17 +22,18 @@ export default function AgentProfilePage() {
       <Card className="p-2 mb-6 border-none shadow-sm rounded-2xl bg-white shrink-0 mx-auto sm:mx-0 sm:w-fit overflow-x-auto custom-scrollbar max-w-full">
         <div className="flex items-center min-w-max">
           {(["Profile", "Edit Profile", "Documents", "Settings"] as const).map(tab => (
-            <button
+            <Button
               key={tab}
+              variant={activeTab === tab ? "default" : "ghost"}
               onClick={() => setActiveTab(tab)}
               className={`px-4 sm:px-8 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === tab 
-                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200" 
+                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200 hover:bg-[#2270c9]" 
                   : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
       </Card>
@@ -47,9 +50,9 @@ export default function AgentProfilePage() {
                     <div className="w-24 h-24 rounded-full bg-[#2b88ef] text-white flex items-center justify-center text-3xl font-bold shadow-md shadow-blue-200">
                       AR
                     </div>
-                    <button className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-200 text-blue-500 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm">
+                    <Button variant="ghost" className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-200 text-blue-500 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm p-0">
                       <Camera className="w-4 h-4" />
-                    </button>
+                    </Button>
                   </div>
                   <div className="pt-2">
                     <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mb-2">
@@ -123,27 +126,27 @@ export default function AgentProfilePage() {
               <Card className="p-6 border-none shadow-sm rounded-3xl bg-white">
                 <h3 className="font-bold text-slate-900 mb-4 text-[15px]">Quick Actions</h3>
                 <div className="flex flex-col gap-1">
-                  <button onClick={() => setActiveTab("Edit Profile")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
+                  <Button variant="ghost" onClick={() => setActiveTab("Edit Profile")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
                     <Edit className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Edit Profile</span>
-                  </button>
-                  <button onClick={() => setActiveTab("Documents")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
+                  </Button>
+                  <Button variant="ghost" onClick={() => setActiveTab("Documents")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
                     <FileText className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Documents</span>
-                  </button>
-                  <button onClick={() => setActiveTab("Settings")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
+                  </Button>
+                  <Button variant="ghost" onClick={() => setActiveTab("Settings")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
                     <Settings className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Settings</span>
-                  </button>
-                  <button className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
+                  </Button>
+                  <Button variant="ghost" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
                     <HelpCircle className="w-4 h-4 text-blue-500" />
                     <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Help & Support</span>
-                  </button>
+                  </Button>
                   <div className="h-px bg-slate-100 my-2"></div>
-                  <button className="flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors group text-left">
+                  <Button variant="ghost" onClick={() => router.push('/login')} className="flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors group text-left">
                     <LogOut className="w-4 h-4 text-red-500" />
                     <span className="text-sm font-semibold text-red-600 group-hover:text-red-700">Logout</span>
-                  </button>
+                  </Button>
                 </div>
               </Card>
             </div>
@@ -225,12 +228,12 @@ export default function AgentProfilePage() {
                       {doc.status}
                     </span>
                     <div className="flex items-center gap-1 ml-auto sm:ml-0">
-                      <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                      <Button variant="ghost" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
                         <Eye className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
+                      </Button>
+                      <Button variant="ghost" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
                         <Download className="w-4 h-4" />
-                      </button>
+                      </Button>
                     </div>
                   </div>
                 </Card>
@@ -280,13 +283,13 @@ export default function AgentProfilePage() {
             <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
               <h3 className="font-bold text-slate-900 mb-5 text-[15px]">Security</h3>
               <div className="flex flex-col gap-5">
-                <button className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-colors w-full text-left">
+                <Button variant="ghost" className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-colors w-full text-left">
                   <div className="flex items-center gap-4">
                     <Lock className="w-5 h-5 text-blue-500 shrink-0" />
                     <h4 className="text-sm font-bold text-slate-900">Change Password</h4>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400" />
-                </button>
+                </Button>
                 
                 <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
                   <div className="flex items-center gap-4">

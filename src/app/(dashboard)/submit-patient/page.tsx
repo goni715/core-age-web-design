@@ -39,9 +39,9 @@ export default function SubmitPatientPage() {
               <div className="flex flex-col gap-2">
                 <label className="text-xs font-semibold text-slate-700">Gender</label>
                 <div className="grid grid-cols-3 gap-3">
-                  <button className="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium text-sm transition-colors">Male</button>
-                  <button className="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium text-sm transition-colors">Female</button>
-                  <button className="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium text-sm transition-colors">Other</button>
+                  <Button className="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium text-sm transition-colors">Male</Button>
+                  <Button className="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium text-sm transition-colors">Female</Button>
+                  <Button className="py-2.5 rounded-xl border border-slate-200 text-slate-600 hover:border-blue-500 hover:text-blue-600 font-medium text-sm transition-colors">Other</Button>
                 </div>
               </div>
             </div>

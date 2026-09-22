@@ -33,17 +33,18 @@ export default function SupportCenterPage() {
       <Card className="p-2 mb-6 border-none shadow-sm rounded-2xl bg-white shrink-0 mx-auto sm:mx-0 sm:w-fit">
         <div className="flex items-center">
           {["Support", "Notifications", "Performance"].map(tab => (
-            <button
+            <Button
               key={tab}
+              variant={activeTab === tab ? "default" : "ghost"}
               onClick={() => setActiveTab(tab as any)}
               className={`px-5 sm:px-8 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                 activeTab === tab 
-                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200" 
+                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200 hover:bg-[#2270c9]" 
                   : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
               }`}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
       </Card>
@@ -98,9 +99,9 @@ export default function SupportCenterPage() {
                     placeholder="Type your message..." 
                     className="w-full pl-5 pr-14 py-4 bg-slate-50 border border-slate-100 rounded-2xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-slate-700"
                   />
-                  <button className="absolute right-2 w-10 h-10 bg-[#2b88ef] hover:bg-blue-600 text-white rounded-xl flex items-center justify-center transition-colors shadow-md shadow-blue-200">
+                  <Button className="absolute right-2 w-10 h-10 bg-[#2b88ef] hover:bg-blue-600 text-white rounded-xl flex items-center justify-center transition-colors shadow-md shadow-blue-200">
                     <Send className="w-4 h-4 ml-0.5" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </Card>
@@ -140,10 +141,10 @@ export default function SupportCenterPage() {
                     { icon: TrendingUp, title: "Withdrawal Guidelines" },
                     { icon: Search, title: "Case Tracking" },
                   ].map((topic, idx) => (
-                    <button key={idx} className="flex items-center gap-3 p-3 text-left hover:bg-slate-50 rounded-xl transition-colors group">
+                    <Button variant="ghost" key={idx} className="flex items-center gap-3 p-3 text-left hover:bg-slate-50 rounded-xl transition-colors group">
                       <topic.icon className="w-4 h-4 text-blue-500 shrink-0" />
                       <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600 transition-colors">{topic.title}</span>
-                    </button>
+                    </Button>
                   ))}
                 </div>
               </Card>

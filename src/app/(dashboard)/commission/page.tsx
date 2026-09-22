@@ -116,7 +116,7 @@ export default function CommissionPage() {
       <Card className="p-2 border-none shadow-sm rounded-2xl bg-white overflow-x-auto custom-scrollbar">
         <div className="flex items-center min-w-max p-2 gap-1 sm:gap-2">
           {tabs.map(tab => (
-            <button
+            <Button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 sm:px-6 py-2 sm:py-2.5 rounded-xl text-sm font-semibold transition-all ${
@@ -126,7 +126,7 @@ export default function CommissionPage() {
               }`}
             >
               {tab}
-            </button>
+            </Button>
           ))}
         </div>
       </Card>

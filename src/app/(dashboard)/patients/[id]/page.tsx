@@ -182,9 +182,9 @@ export default function PatientDetailsPage({ params }: { params: { id: string } 
                       <p className="text-[11px] font-medium text-slate-500">{doc.size} • {doc.date}</p>
                     </div>
                   </div>
-                  <button className="p-2 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors">
+                  <Button className="p-2 text-blue-500 hover:bg-blue-100 rounded-lg transition-colors">
                     <Download className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               ))}
             </div>

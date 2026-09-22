@@ -142,9 +142,9 @@ export default function AgentDashboard() {
                   <span className={`px-3 py-1 rounded-full text-[11px] font-bold text-white ${caseItem.statusBg} min-w-[90px] text-center`}>
                     {caseItem.status}
                   </span>
-                  <button className="w-8 h-8 rounded-full hover:bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
+                  <Button className="w-8 h-8 rounded-full hover:bg-slate-50 flex items-center justify-center text-slate-400 hover:text-slate-600 transition-colors">
                     <ArrowRight className="w-4 h-4" />
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>

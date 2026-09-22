@@ -38,7 +38,7 @@ export default function OtpVerification() {
 
         <p className="text-sm text-slate-500 mb-8">
           Didn't receive the code? <br />
-          <button className="text-slate-900 font-bold hover:underline mt-1">Resend in 57s</button>
+          <Button className="text-slate-900 font-bold hover:underline mt-1">Resend in 57s</Button>
         </p>
 
         <div className="bg-emerald-50/50 text-emerald-700 text-xs py-3 px-4 rounded-lg w-full text-center font-medium">
