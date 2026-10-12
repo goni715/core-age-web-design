@@ -58,12 +58,12 @@ export default function SubmitSuccessPage() {
 
         {/* Buttons */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full">
-          <Link href="/agent/cases">
-            <Button className="w-full bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-6 rounded-xl shadow-md">
+          <Link href="/patients">
+            <Button className="w-full bg-[#0062c4] hover:bg-[#0051a8] text-white font-semibold py-6 rounded-xl shadow-md">
               <FileText className="w-4 h-4 mr-2" /> View All Cases
             </Button>
           </Link>
-          <Link href="/agent">
+          <Link href="/">
             <Button variant="outline" className="w-full py-6 rounded-xl border-blue-200 text-blue-600 font-semibold hover:bg-blue-50">
               Back to Dashboard
             </Button>

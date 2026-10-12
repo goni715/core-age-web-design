@@ -2,123 +2,459 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ChevronDown, Check } from "lucide-react";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 
 export default function PatientsPage() {
-  const [activeTab, setActiveTab] = useState("All");
+  const [activeTab, setActiveTab] = useState("All (386)");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedPartner, setSelectedPartner] = useState("All referral partners");
+  const [selectedCountry, setSelectedCountry] = useState("All");
+  const [selectedPatientId, setSelectedPatientId] = useState("CS-2847");
 
-  const tabs = ["All", "Submitted", "Under Review", "Confirmed", "Ongoing", "Completed"];
-
-  const patients = [
-    { initials: "JS", name: "John Smith", status: "Ongoing", statusColor: "bg-teal-500", caseId: "CS-2847", treatment: "Cardiac Surgery", country: "India", budget: "$15,000" },
-    { initials: "SJ", name: "Sarah Johnson", status: "Under Review", statusColor: "bg-amber-500", caseId: "CS-2846", treatment: "Orthopedic Surgery", country: "Thailand", budget: "$8,500" },
-    { initials: "MB", name: "Michael Brown", status: "Confirmed", statusColor: "bg-blue-500", caseId: "CS-2845", treatment: "Cancer Treatment", country: "Singapore", budget: "$25,000" },
-    { initials: "ED", name: "Emily Davis", status: "Completed", statusColor: "bg-emerald-500", caseId: "CS-2844", treatment: "Dental Implants", country: "Malaysia", budget: "$3,200" },
-    { initials: "DW", name: "David Wilson", status: "Ongoing", statusColor: "bg-teal-500", caseId: "CS-2843", treatment: "Eye Surgery", country: "India", budget: "$6,500" },
-    { initials: "LA", name: "Lisa Anderson", status: "Submitted", statusColor: "bg-blue-400", caseId: "CS-2842", treatment: "Spine Surgery", country: "Thailand", budget: "$12,000" },
-    { initials: "JT", name: "James Taylor", status: "Under Review", statusColor: "bg-amber-500", caseId: "CS-2841", treatment: "Kidney Transplant", country: "India", budget: "$18,000" },
-    { initials: "MG", name: "Maria Garcia", status: "Completed", statusColor: "bg-emerald-500", caseId: "CS-2840", treatment: "Hip Replacement", country: "Malaysia", budget: "$9,800" },
-    { initials: "RM", name: "Robert Martinez", status: "Ongoing", statusColor: "bg-teal-500", caseId: "CS-2839", treatment: "Heart Valve Surgery", country: "Singapore", budget: "$22,000" },
-    { initials: "JL", name: "Jennifer Lee", status: "Confirmed", statusColor: "bg-blue-500", caseId: "CS-2838", treatment: "Cosmetic Surgery", country: "Thailand", budget: "$5,500" },
+  const tabs = [
+    { label: "All (386)", key: "All" },
+    { label: "Submitted (24)", key: "Submitted" },
+    { label: "Under review (31)", key: "Under review" },
+    { label: "Confirmed (22)", key: "Confirmed" },
+    { label: "Ongoing (41)", key: "Ongoing" },
+    { label: "Completed (268)", key: "Completed" },
   ];
 
-  const filteredPatients = activeTab === "All" ? patients : patients.filter(p => p.status === activeTab);
+  const patients = [
+    {
+      id: "CS-2847",
+      name: "John Smith",
+      treatment: "Cardiac surgery",
+      country: "India",
+      submittedBy: "Nusrat Jahan",
+      submittedByRole: "Via Channel Partner A",
+      submittedById: "RP-0112",
+      channelPartner: "Channel Partner A",
+      onboardingPath: "Via Channel Partner",
+      status: "Ongoing",
+      statusBadge: "bg-[#e0f2fe] text-[#0284c7]",
+      commissionStatus: "Pending approval",
+      progressSteps: [
+        { label: "Submitted", date: "02 Sep 2026", status: "completed" },
+        { label: "Under review", date: "04 Sep 2026", status: "completed" },
+        { label: "Confirmed", date: "09 Sep 2026", status: "completed" },
+        { label: "Ongoing", date: "28 Sep 2026", status: "current" },
+        { label: "Completed", date: "Not yet", status: "pending" },
+      ],
+    },
+    {
+      id: "CS-2846",
+      name: "Sarah Johnson",
+      treatment: "Orthopedic surgery",
+      country: "Thailand",
+      submittedBy: "Imran Hossain",
+      submittedByRole: "Via Channel Partner A",
+      submittedById: "RP-0115",
+      channelPartner: "Channel Partner A",
+      onboardingPath: "Via Channel Partner",
+      status: "Under review",
+      statusBadge: "bg-[#ffedd5] text-[#d97706]",
+      commissionStatus: "Pending submission",
+      progressSteps: [
+        { label: "Submitted", date: "01 Sep 2026", status: "completed" },
+        { label: "Under review", date: "04 Sep 2026", status: "current" },
+        { label: "Confirmed", date: "Pending", status: "pending" },
+        { label: "Ongoing", date: "Pending", status: "pending" },
+        { label: "Completed", date: "Not yet", status: "pending" },
+      ],
+    },
+    {
+      id: "CS-2845",
+      name: "Michael Brown",
+      treatment: "Cancer treatment",
+      country: "Singapore",
+      submittedBy: "You",
+      submittedByRole: "Direct submission",
+      submittedById: "Direct",
+      channelPartner: "Direct Partner",
+      onboardingPath: "Direct",
+      status: "Confirmed",
+      statusBadge: "bg-[#d1fae5] text-[#059669]",
+      commissionStatus: "Under review",
+      progressSteps: [
+        { label: "Submitted", date: "28 Aug 2026", status: "completed" },
+        { label: "Under review", date: "31 Aug 2026", status: "completed" },
+        { label: "Confirmed", date: "05 Sep 2026", status: "current" },
+        { label: "Ongoing", date: "Pending", status: "pending" },
+        { label: "Completed", date: "Not yet", status: "pending" },
+      ],
+    },
+    {
+      id: "CS-2844",
+      name: "Emily Davis",
+      treatment: "Dental implants",
+      country: "Malaysia",
+      submittedBy: "Farhana Akter",
+      submittedByRole: "Via Channel Partner A",
+      submittedById: "RP-0120",
+      channelPartner: "Channel Partner A",
+      onboardingPath: "Via Channel Partner",
+      status: "Completed",
+      statusBadge: "bg-[#e2e8f0]/80 text-[#475569]",
+      commissionStatus: "Paid",
+      progressSteps: [
+        { label: "Submitted", date: "10 Aug 2026", status: "completed" },
+        { label: "Under review", date: "12 Aug 2026", status: "completed" },
+        { label: "Confirmed", date: "15 Aug 2026", status: "completed" },
+        { label: "Ongoing", date: "20 Aug 2026", status: "completed" },
+        { label: "Completed", date: "01 Sep 2026", status: "completed" },
+      ],
+    },
+    {
+      id: "CS-2843",
+      name: "David Wilson",
+      treatment: "Eye surgery",
+      country: "India",
+      submittedBy: "Rakib Chowdhury",
+      submittedByRole: "Via Channel Partner A",
+      submittedById: "RP-0108",
+      channelPartner: "Channel Partner A",
+      onboardingPath: "Via Channel Partner",
+      status: "Ongoing",
+      statusBadge: "bg-[#e0f2fe] text-[#0284c7]",
+      commissionStatus: "Pending approval",
+      progressSteps: [
+        { label: "Submitted", date: "15 Aug 2026", status: "completed" },
+        { label: "Under review", date: "18 Aug 2026", status: "completed" },
+        { label: "Confirmed", date: "22 Aug 2026", status: "completed" },
+        { label: "Ongoing", date: "01 Sep 2026", status: "current" },
+        { label: "Completed", date: "Not yet", status: "pending" },
+      ],
+    },
+    {
+      id: "CS-2842",
+      name: "Anna Lee",
+      treatment: "Knee replacement",
+      country: "Thailand",
+      submittedBy: "Mahmudul Hasan",
+      submittedByRole: "Via Channel Partner A",
+      submittedById: "RP-0125",
+      channelPartner: "Channel Partner A",
+      onboardingPath: "Via Channel Partner",
+      status: "Submitted",
+      statusBadge: "bg-[#e0f2fe] text-[#0284c7]",
+      commissionStatus: "Pending review",
+      progressSteps: [
+        { label: "Submitted", date: "03 Sep 2026", status: "current" },
+        { label: "Under review", date: "Pending", status: "pending" },
+        { label: "Confirmed", date: "Pending", status: "pending" },
+        { label: "Ongoing", date: "Pending", status: "pending" },
+        { label: "Completed", date: "Not yet", status: "pending" },
+      ],
+    },
+    {
+      id: "CS-2841",
+      name: "Robert Chen",
+      treatment: "Spine surgery",
+      country: "China",
+      submittedBy: "Tasnim Sultana",
+      submittedByRole: "Via Channel Partner A",
+      submittedById: "RP-0130",
+      channelPartner: "Channel Partner A",
+      onboardingPath: "Via Channel Partner",
+      status: "Under review",
+      statusBadge: "bg-[#ffedd5] text-[#d97706]",
+      commissionStatus: "Pending review",
+      progressSteps: [
+        { label: "Submitted", date: "02 Sep 2026", status: "completed" },
+        { label: "Under review", date: "05 Sep 2026", status: "current" },
+        { label: "Confirmed", date: "Pending", status: "pending" },
+        { label: "Ongoing", date: "Pending", status: "pending" },
+        { label: "Completed", date: "Not yet", status: "pending" },
+      ],
+    },
+  ];
+
+  const selectedPatient = patients.find((p) => p.id === selectedPatientId) || patients[0];
+
+  // Filtering
+  const filteredPatients = patients.filter((patient) => {
+    const tabMatch =
+      activeTab === "All (386)" ||
+      patient.status.toLowerCase() === activeTab.split(" ")[0].toLowerCase();
+    const searchMatch =
+      patient.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      patient.treatment.toLowerCase().includes(searchQuery.toLowerCase());
+    const countryMatch =
+      selectedCountry === "All" || patient.country === selectedCountry;
+    return tabMatch && searchMatch && countryMatch;
+  });
 
   return (
-    <div className="max-w-6xl mx-auto flex flex-col h-full">
-      <div className="mb-8 shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-1">Submitted Patients</h1>
-          <p className="text-slate-500 text-sm">View and manage all your submitted patient cases</p>
-        </div>
-        <Link href="/agent/submit-patient">
-          <Button className="bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-5 px-6 rounded-xl shadow-md shadow-blue-200 text-sm">
-            Submit New
-          </Button>
-        </Link>
+    <div className="max-w-[1360px] mx-auto space-y-5">
+      {/* 1. Tabs / Filter Pills */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
+        {tabs.map((tab) => (
+          <button
+            key={tab.label}
+            onClick={() => setActiveTab(tab.label)}
+            className={`px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
+              activeTab === tab.label
+                ? "bg-[#005ca9] text-white shadow-xs"
+                : "bg-white text-slate-700 hover:bg-slate-50 border border-slate-200/80"
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      <Card className="p-4 mb-6 border-none shadow-sm rounded-2xl bg-white shrink-0">
-        <div className="relative">
-          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-            <Search className="w-5 h-5" />
-          </div>
-          <input 
-            type="text" 
-            placeholder="Search by patient name, case ID, or treatment..." 
-            className="w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-100 rounded-xl text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-slate-700"
+      {/* 2. Search & Filter Controls Bar */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+        {/* Search input */}
+        <div className="relative flex-1 sm:max-w-md">
+          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search patient or case ID"
+            className="w-full bg-white border border-slate-200/90 rounded-xl pl-9 pr-4 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-1 focus:ring-blue-500 shadow-2xs"
           />
         </div>
-      </Card>
 
-      <Card className="p-2 mb-6 border-none shadow-sm rounded-2xl bg-white shrink-0 overflow-x-auto custom-scrollbar">
-        <div className="flex items-center min-w-max p-2 gap-1 sm:gap-2">
-          {tabs.map(tab => (
-            <Button
-              key={tab}
-              variant={activeTab === tab ? "default" : "ghost"}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                activeTab === tab 
-                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200 hover:bg-[#2270c9]" 
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-              }`}
-            >
-              {tab}
-            </Button>
-          ))}
+        {/* Filter Dropdowns */}
+        <div className="flex items-center gap-2.5">
+          <div className="relative">
+            <button className="bg-white border border-slate-200/90 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 shadow-2xs">
+              <span>Submitted by: {selectedPartner}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+          </div>
+
+          <div className="relative">
+            <button className="bg-white border border-slate-200/90 rounded-xl px-3.5 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2 shadow-2xs">
+              <span>Country: {selectedCountry}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+            </button>
+          </div>
         </div>
-      </Card>
-
-      <div className="mb-4 text-xs font-semibold text-slate-500 shrink-0 px-2">
-        Showing <span className="text-slate-900">{filteredPatients.length}</span> results
       </div>
 
-      <div className="flex flex-col gap-4 pb-10">
-        {filteredPatients.map((patient, idx) => (
-          <Card key={idx} className="p-4 sm:p-5 md:p-6 border-none shadow-sm hover:shadow-md transition-shadow rounded-2xl bg-white flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            
-            <div className="flex items-start sm:items-center gap-4 sm:gap-6">
-              <div className="w-12 h-12 rounded-full bg-[#2b88ef] text-white flex items-center justify-center text-lg font-bold shrink-0 shadow-sm shadow-blue-200">
-                {patient.initials}
+      {/* 3. Main Split Content Area */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        {/* Left Column: Cases Table */}
+        <div className="lg:col-span-8">
+          <Card className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="border-b border-slate-100/90">
+                    <th className="pb-3 text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
+                      PATIENT
+                    </th>
+                    <th className="pb-3 text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
+                      TREATMENT
+                    </th>
+                    <th className="pb-3 text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
+                      COUNTRY
+                    </th>
+                    <th className="pb-3 text-[11px] font-semibold text-slate-400 tracking-wider uppercase">
+                      SUBMITTED BY
+                    </th>
+                    <th className="pb-3 text-[11px] font-semibold text-slate-400 tracking-wider uppercase text-right">
+                      STATUS
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-50/80">
+                  {filteredPatients.map((item) => {
+                    const isSelected = selectedPatient.id === item.id;
+                    return (
+                      <tr
+                        key={item.id}
+                        onClick={() => setSelectedPatientId(item.id)}
+                        className={`cursor-pointer transition-colors ${
+                          isSelected
+                            ? "bg-[#f0f7ff] border-l-2 border-blue-600"
+                            : "hover:bg-slate-50/60"
+                        }`}
+                      >
+                        {/* Patient Name & ID */}
+                        <td className="py-3 px-3">
+                          <div className="font-bold text-slate-900 text-sm leading-tight">
+                            {item.name}
+                          </div>
+                          <div className="text-xs text-slate-400 mt-0.5 font-normal">
+                            {item.id}
+                          </div>
+                        </td>
+
+                        {/* Treatment */}
+                        <td className="py-3 px-3 text-xs sm:text-sm text-slate-700 font-normal">
+                          {item.treatment}
+                        </td>
+
+                        {/* Country */}
+                        <td className="py-3 px-3 text-xs sm:text-sm text-slate-700 font-normal">
+                          {item.country}
+                        </td>
+
+                        {/* Submitted by */}
+                        <td className="py-3 px-3">
+                          <div className="text-xs sm:text-sm font-semibold text-slate-800 leading-tight">
+                            {item.submittedBy}
+                          </div>
+                          <div className="text-[11px] text-slate-400 mt-0.5 font-normal">
+                            {item.submittedByRole}
+                          </div>
+                        </td>
+
+                        {/* Status */}
+                        <td className="py-3 px-3 text-right">
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${item.statusBadge} min-w-[85px] text-center`}
+                          >
+                            {item.status}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
+              <span>Showing {filteredPatients.length} of 386 cases</span>
+            </div>
+          </Card>
+        </div>
+
+        {/* Right Column: Case Quick Preview Drawer */}
+        <div className="lg:col-span-4">
+          <Card className="bg-white rounded-2xl p-5 border border-slate-100 shadow-2xs space-y-5 sticky top-24">
+            {/* Header: Case ID, Status, Patient Name */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-slate-500 font-medium">
+                  Case {selectedPatient.id}
+                </span>
+                <span
+                  className={`px-3 py-0.5 rounded-full text-xs font-semibold ${selectedPatient.statusBadge}`}
+                >
+                  {selectedPatient.status}
+                </span>
               </div>
-              
-              <div>
-                <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-1.5">
-                  <h3 className="text-[17px] font-bold text-slate-900 leading-none">{patient.name}</h3>
-                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white ${patient.statusColor}`}>
-                    {patient.status}
-                  </span>
-                </div>
-                
-                <div className="flex flex-wrap items-center text-xs text-slate-500 gap-y-1 gap-x-2 sm:gap-x-3">
-                  <span className="flex items-center gap-1.5">
-                    Case ID: <span className="font-semibold text-slate-700">{patient.caseId}</span>
-                  </span>
-                  <span className="hidden sm:inline w-1 h-1 bg-slate-300 rounded-full"></span>
-                  <span>{patient.treatment}</span>
-                  <span className="hidden sm:inline w-1 h-1 bg-slate-300 rounded-full"></span>
-                  <span>{patient.country}</span>
-                </div>
+              <h2 className="text-xl font-bold text-slate-900 tracking-tight">
+                {selectedPatient.name}
+              </h2>
+              <p className="text-xs text-slate-500 mt-0.5">
+                {selectedPatient.treatment}, {selectedPatient.country}
+              </p>
+            </div>
+
+            {/* Case Origin Box */}
+            <div className="bg-[#f8fafc] rounded-xl p-3.5 border border-slate-100/90 text-xs space-y-2">
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase block">
+                CASE ORIGIN
+              </span>
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-slate-500 font-normal">Submitted by</span>
+                <span className="font-bold text-slate-900 text-right">
+                  {selectedPatient.submittedBy}{" "}
+                  {selectedPatient.submittedById !== "Direct" &&
+                    `(${selectedPatient.submittedById})`}
+                </span>
+              </div>
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-slate-500 font-normal">Channel Partner</span>
+                <span className="font-bold text-slate-900 text-right">
+                  {selectedPatient.channelPartner}
+                </span>
+              </div>
+              <div className="flex items-start justify-between gap-2">
+                <span className="text-slate-500 font-normal">Onboarding path</span>
+                <span className="font-bold text-slate-900 text-right">
+                  {selectedPatient.onboardingPath}
+                </span>
               </div>
             </div>
 
-            <div className="flex items-center justify-between lg:justify-end gap-6 pt-4 lg:pt-0 border-t border-slate-100 lg:border-t-0">
-              <div className="flex flex-col items-start lg:items-end">
-                <span className="text-[10px] font-medium text-slate-400 mb-0.5">Budget</span>
-                <span className="text-lg font-bold text-slate-900">{patient.budget}</span>
+            {/* Progress Stepper */}
+            <div>
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase block mb-3.5">
+                PROGRESS
+              </span>
+
+              <div className="relative pl-6 space-y-4">
+                {selectedPatient.progressSteps.map((step, idx) => {
+                  const isCompleted = step.status === "completed";
+                  const isCurrent = step.status === "current";
+                  const isLast = idx === selectedPatient.progressSteps.length - 1;
+
+                  return (
+                    <div key={idx} className="relative flex items-start justify-between">
+                      {/* Connecting Line */}
+                      {!isLast && (
+                        <div
+                          className={`absolute left-[-15px] top-[14px] w-[2px] h-[calc(100%+8px)] ${
+                            isCompleted ? "bg-[#059669]" : "bg-slate-200"
+                          }`}
+                        />
+                      )}
+
+                      {/* Icon / Circle Indicator */}
+                      <div className="absolute left-[-22px] top-[1px] flex items-center justify-center">
+                        {isCompleted ? (
+                          <div className="w-4 h-4 rounded-full bg-[#059669] text-white flex items-center justify-center shadow-2xs">
+                            <Check className="w-2.5 h-2.5 stroke-[3]" />
+                          </div>
+                        ) : isCurrent ? (
+                          <div className="w-4 h-4 rounded-full border-2 border-[#0062c4] bg-white flex items-center justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#0062c4]" />
+                          </div>
+                        ) : (
+                          <div className="w-4 h-4 rounded-full border-2 border-slate-300 bg-white" />
+                        )}
+                      </div>
+
+                      {/* Step Labels */}
+                      <div>
+                        <div
+                          className={`text-xs font-bold leading-tight ${
+                            isCompleted || isCurrent ? "text-slate-900" : "text-slate-400"
+                          }`}
+                        >
+                          {step.label}
+                        </div>
+                        <div className="text-[11px] text-slate-400 mt-0.5">
+                          {step.date}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
-              <Link href={`/agent/patients/${patient.caseId}`}>
-                <Button className="bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-5 px-6 rounded-xl shadow-md shadow-blue-200 text-sm">
-                  View Details <ArrowRight className="w-4 h-4 ml-1.5" />
-                </Button>
+            </div>
+
+            {/* Bottom Commission Box & Details Button */}
+            <div className="pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
+              <div>
+                <span className="text-xs text-slate-400 font-normal block leading-tight">
+                  Commission on this case
+                </span>
+                <span className="text-sm font-bold text-slate-900 block mt-0.5">
+                  {selectedPatient.commissionStatus}
+                </span>
+              </div>
+
+              <Link
+                href={`/patients/${selectedPatient.id}`}
+                className="border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-2 px-3.5 rounded-xl transition-colors shrink-0 shadow-2xs"
+              >
+                View details
               </Link>
             </div>
-            
           </Card>
-        ))}
+        </div>
       </div>
     </div>
   );

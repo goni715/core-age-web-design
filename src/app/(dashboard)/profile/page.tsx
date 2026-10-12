@@ -1,340 +1,237 @@
 "use client";
 
-import React, { useState } from "react";
-import { Camera, TrendingUp, CheckCircle2, Phone, Mail, MapPin, Edit, FileText, Settings, HelpCircle, LogOut, Upload, Eye, Download, Bell, Lock, Globe, ChevronRight } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import {
+  User,
+  Phone,
+  Mail,
+  MapPin,
+  CheckCircle2,
+  Award,
+  DollarSign,
+  Building2,
+  Edit,
+  ArrowRight,
+  Headphones,
+  Calendar,
+  MessageSquare,
+} from "lucide-react";
+import { Card } from "@/components/ui/card";
 
-export default function AgentProfilePage() {
-  const [activeTab, setActiveTab] = useState<"Profile" | "Edit Profile" | "Documents" | "Settings">("Profile");
-  const router = useRouter();
-
+export default function ProfileOverviewPage() {
   return (
-    <div className="max-w-5xl mx-auto flex flex-col h-full">
-      <div className="mb-6 shrink-0">
-        <h1 className="text-2xl font-bold text-slate-900 mb-1">Agent Profile</h1>
-        <p className="text-slate-500 text-sm">Manage your account and preferences</p>
-      </div>
-
-      {/* Tabs */}
-      <Card className="p-2 mb-6 border-none shadow-sm rounded-2xl bg-white shrink-0 mx-auto sm:mx-0 sm:w-fit overflow-x-auto custom-scrollbar max-w-full">
-        <div className="flex items-center min-w-max">
-          {(["Profile", "Edit Profile", "Documents", "Settings"] as const).map(tab => (
-            <Button
-              key={tab}
-              variant={activeTab === tab ? "default" : "ghost"}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 sm:px-8 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                activeTab === tab 
-                  ? "bg-[#2b88ef] text-white shadow-md shadow-blue-200 hover:bg-[#2270c9]" 
-                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
-              }`}
-            >
-              {tab}
-            </Button>
-          ))}
-        </div>
-      </Card>
-
-      <div className="flex-1 min-h-0 pb-10 overflow-y-auto custom-scrollbar pr-2">
-        
-        {/* Profile Tab */}
-        {activeTab === "Profile" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-8 text-center sm:text-left">
-                  <div className="relative">
-                    <div className="w-24 h-24 rounded-full bg-[#2b88ef] text-white flex items-center justify-center text-3xl font-bold shadow-md shadow-blue-200">
-                      AR
-                    </div>
-                    <Button variant="ghost" className="absolute bottom-0 right-0 w-8 h-8 bg-white border border-slate-200 text-blue-500 rounded-full flex items-center justify-center hover:bg-slate-50 transition-colors shadow-sm p-0">
-                      <Camera className="w-4 h-4" />
-                    </Button>
-                  </div>
-                  <div className="pt-2">
-                    <div className="flex flex-wrap justify-center sm:justify-start items-center gap-3 mb-2">
-                      <h2 className="text-2xl font-bold text-slate-900">Ahmed Rahman</h2>
-                      <span className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-full">Premium Agent</span>
-                    </div>
-                    <div className="text-sm font-semibold text-slate-500 mb-2">Agent ID: <span className="text-slate-700">AGT-2547</span></div>
-                    <div className="text-xs font-medium text-slate-400 flex items-center justify-center sm:justify-start gap-1.5">
-                      <div className="w-3.5 h-3.5 border border-slate-300 rounded-sm"></div> Member since January 2024
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 flex items-center gap-4">
-                    <div className="p-3 bg-blue-100 text-blue-500 rounded-xl">
-                      <TrendingUp className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-slate-900 leading-none mb-1">142</div>
-                      <div className="text-xs font-semibold text-slate-500">Total Cases</div>
-                    </div>
-                  </div>
-                  <div className="bg-slate-50 border border-slate-100 rounded-2xl p-5 flex items-center gap-4">
-                    <div className="p-3 bg-emerald-100 text-emerald-500 rounded-xl">
-                      <CheckCircle2 className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-bold text-slate-900 leading-none mb-1">94%</div>
-                      <div className="text-xs font-semibold text-slate-500">Success Rate</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
-                <h3 className="font-bold text-slate-900 mb-6 text-[15px]">Contact Information</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div className="flex items-start gap-4">
-                    <div className="p-2.5 bg-teal-50 text-teal-600 rounded-xl mt-0.5">
-                      <Phone className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Phone</div>
-                      <div className="text-sm font-bold text-slate-900">+880 1712-345678</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl mt-0.5">
-                      <Mail className="w-5 h-5" />
-                    </div>
-                    <div className="truncate w-full">
-                      <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Email</div>
-                      <div className="text-sm font-bold text-slate-900 truncate">ahmed.rahman@email.com</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4 sm:col-span-2">
-                    <div className="p-2.5 bg-emerald-50 text-emerald-600 rounded-xl mt-0.5">
-                      <MapPin className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-0.5">Address</div>
-                      <div className="text-sm font-bold text-slate-900">Dhaka, Bangladesh</div>
-                    </div>
-                  </div>
-                </div>
-              </Card>
+    <div className="space-y-6">
+      {/* 2-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Personal Information & Tier Details (2 cols) */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Personal Information */}
+          <Card className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-100 shadow-2xs">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 mb-5">
+              <div>
+                <h2 className="text-base font-bold text-slate-900">Personal & Contact Details</h2>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Verified details linked with your partner agreement and payout records
+                </p>
+              </div>
+              <Link
+                href="/profile/edit"
+                className="flex items-center gap-1.5 text-xs font-semibold text-[#0062c4] hover:text-[#004e90] bg-blue-50/80 hover:bg-blue-100/80 px-3.5 py-1.5 rounded-full transition-colors"
+              >
+                <Edit className="w-3.5 h-3.5" />
+                <span>Edit Details</span>
+              </Link>
             </div>
 
-            <div className="lg:col-span-1">
-              <Card className="p-6 border-none shadow-sm rounded-3xl bg-white">
-                <h3 className="font-bold text-slate-900 mb-4 text-[15px]">Quick Actions</h3>
-                <div className="flex flex-col gap-1">
-                  <Button variant="ghost" onClick={() => setActiveTab("Edit Profile")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
-                    <Edit className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Edit Profile</span>
-                  </Button>
-                  <Button variant="ghost" onClick={() => setActiveTab("Documents")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
-                    <FileText className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Documents</span>
-                  </Button>
-                  <Button variant="ghost" onClick={() => setActiveTab("Settings")} className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
-                    <Settings className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Settings</span>
-                  </Button>
-                  <Button variant="ghost" className="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-50 transition-colors group text-left">
-                    <HelpCircle className="w-4 h-4 text-blue-500" />
-                    <span className="text-sm font-semibold text-slate-700 group-hover:text-blue-600">Help & Support</span>
-                  </Button>
-                  <div className="h-px bg-slate-100 my-2"></div>
-                  <Button variant="ghost" onClick={() => router.push('/login')} className="flex items-center gap-3 p-3 rounded-xl hover:bg-red-50 transition-colors group text-left">
-                    <LogOut className="w-4 h-4 text-red-500" />
-                    <span className="text-sm font-semibold text-red-600 group-hover:text-red-700">Logout</span>
-                  </Button>
-                </div>
-              </Card>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-6 text-xs">
+              <div className="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                <span className="text-slate-400 block mb-1 font-medium">Full Name</span>
+                <span className="text-slate-900 font-bold text-sm">Ahmed Rahman</span>
+              </div>
+              <div className="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                <span className="text-slate-400 block mb-1 font-medium">Partner ID</span>
+                <span className="text-slate-900 font-mono font-bold text-sm">RP-0112</span>
+              </div>
+              <div className="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                <span className="text-slate-400 block mb-1 font-medium">Email Address</span>
+                <span className="text-slate-900 font-semibold flex items-center gap-1.5">
+                  <Mail className="w-3.5 h-3.5 text-slate-400" />
+                  ahmed.rahman@medicare.bd
+                </span>
+              </div>
+              <div className="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                <span className="text-slate-400 block mb-1 font-medium">Phone Number</span>
+                <span className="text-slate-900 font-semibold flex items-center gap-1.5">
+                  <Phone className="w-3.5 h-3.5 text-slate-400" />
+                  +880 1712-345678
+                </span>
+              </div>
+              <div className="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                <span className="text-slate-400 block mb-1 font-medium">WhatsApp Hotline</span>
+                <span className="text-[#059669] font-bold flex items-center gap-1.5">
+                  +880 1712-345678
+                </span>
+              </div>
+              <div className="bg-slate-50/70 p-3.5 rounded-2xl border border-slate-100">
+                <span className="text-slate-400 block mb-1 font-medium">Operating City & Country</span>
+                <span className="text-slate-900 font-semibold flex items-center gap-1.5">
+                  <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  Dhaka, Bangladesh
+                </span>
+              </div>
             </div>
-          </div>
-        )}
-
-        {/* Edit Profile Tab */}
-        {activeTab === "Edit Profile" && (
-          <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white max-w-3xl">
-            <h3 className="font-bold text-slate-900 mb-6 text-[17px]">Edit Profile Information</h3>
-            <form className="flex flex-col gap-5">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-slate-700">Full Name</label>
-                  <input type="text" defaultValue="Ahmed Rahman" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-900" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-slate-700">Phone Number</label>
-                  <input type="text" defaultValue="+880 1712-345678" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-900" />
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold text-slate-700">Email Address</label>
-                <input type="email" defaultValue="ahmed.rahman@email.com" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-900" />
-              </div>
-
-              <div className="flex flex-col gap-2">
-                <label className="text-xs font-semibold text-slate-700">Address</label>
-                <textarea rows={3} className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-900 resize-none"></textarea>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-4">
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-slate-700">NID Number</label>
-                  <input type="text" defaultValue="1234567890123" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-900" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <label className="text-xs font-semibold text-slate-700">Bank Account Number</label>
-                  <input type="text" defaultValue="1234567890" className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 outline-none transition-all text-sm text-slate-900" />
-                </div>
-              </div>
-
-              <Button type="button" className="w-fit bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-5 px-8 rounded-xl shadow-md shadow-blue-200">
-                <FileText className="w-4 h-4 mr-2" /> Save Changes
-              </Button>
-            </form>
           </Card>
-        )}
 
-        {/* Documents Tab */}
-        {activeTab === "Documents" && (
-          <div className="flex flex-col gap-6">
-            <div className="flex justify-end">
-              <Button className="bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-5 px-6 rounded-xl shadow-md shadow-blue-200">
-                <Upload className="w-4 h-4 mr-2" /> Upload New Document
-              </Button>
+          {/* Partnership Tier & Privileges */}
+          <Card className="bg-gradient-to-br from-[#004e90] to-[#0062c4] text-white rounded-3xl p-6 sm:p-7 shadow-xs relative overflow-hidden">
+            <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 w-64 h-64 bg-white/5 rounded-full pointer-events-none" />
+            <div className="relative z-10 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Award className="w-5 h-5 text-amber-300" />
+                  <span className="text-xs uppercase font-bold tracking-wider text-blue-200">
+                    Partner Tier
+                  </span>
+                </div>
+                <span className="bg-white/20 text-white text-[11px] font-bold px-3 py-1 rounded-full backdrop-blur-xs">
+                  Tier 3 (Gold)
+                </span>
+              </div>
+
+              <div>
+                <h3 className="text-lg font-bold text-white">Premium Referral Partner</h3>
+                <p className="text-xs text-blue-100/90 mt-1 max-w-lg leading-relaxed">
+                  You are eligible for highest commission slabs, expedited visa handling, and exclusive hospital access in Thailand, India, and China.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div className="bg-white/10 rounded-2xl p-3 border border-white/10 backdrop-blur-xs">
+                  <span className="text-[11px] text-blue-200 block">Commission Rate</span>
+                  <span className="text-base font-bold text-white mt-0.5 block">12% - 15%</span>
+                </div>
+                <div className="bg-white/10 rounded-2xl p-3 border border-white/10 backdrop-blur-xs">
+                  <span className="text-[11px] text-blue-200 block">Payout Frequency</span>
+                  <span className="text-base font-bold text-white mt-0.5 block">Bi-Weekly</span>
+                </div>
+                <div className="bg-white/10 rounded-2xl p-3 border border-white/10 backdrop-blur-xs">
+                  <span className="text-[11px] text-blue-200 block">VIP Concierge</span>
+                  <span className="text-base font-bold text-emerald-300 mt-0.5 block">Enabled</span>
+                </div>
+              </div>
             </div>
-            
-            <div className="flex flex-col gap-4">
-              {[
-                { name: "NID Copy", size: "2.4 MB", date: "Jan 15, 2026", status: "Verified", statusColor: "bg-emerald-500" },
-                { name: "Trade License", size: "1.8 MB", date: "Jan 15, 2026", status: "Verified", statusColor: "bg-emerald-500" },
-                { name: "Bank Statement", size: "3.2 MB", date: "May 10, 2026", status: "Pending Review", statusColor: "bg-orange-500" },
-                { name: "Agent Agreement", size: "1.5 MB", date: "Jan 15, 2026", status: "Verified", statusColor: "bg-emerald-500" },
-              ].map((doc, idx) => (
-                <Card key={idx} className="p-4 sm:p-6 border border-slate-100 shadow-sm hover:shadow-md transition-shadow rounded-2xl bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 bg-orange-50 text-orange-500 rounded-xl shrink-0">
-                      <FileText className="w-6 h-6" />
-                    </div>
-                    <div>
-                      <h4 className="text-[15px] font-bold text-slate-900 mb-1">{doc.name}</h4>
-                      <p className="text-xs font-medium text-slate-500">PDF • {doc.size} <span className="hidden sm:inline mx-1">•</span><br className="sm:hidden" /> Uploaded: {doc.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4 pt-2 sm:pt-0 border-t sm:border-t-0 border-slate-100">
-                    <span className={`px-3 py-1 text-white text-[11px] font-bold rounded-full ${doc.statusColor}`}>
-                      {doc.status}
-                    </span>
-                    <div className="flex items-center gap-1 ml-auto sm:ml-0">
-                      <Button variant="ghost" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                      <Button variant="ghost" className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors">
-                        <Download className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+          </Card>
+        </div>
+
+        {/* Right Column: Account Manager & Fast Actions */}
+        <div className="space-y-6">
+          {/* Dedicated Account Manager */}
+          <Card className="bg-white rounded-3xl p-6 border border-slate-100 shadow-2xs space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-700 font-bold text-base shrink-0">
+                PS
+              </div>
+              <div>
+                <span className="text-[11px] font-semibold text-teal-700 uppercase tracking-wider block">
+                  Dedicated Manager
+                </span>
+                <h3 className="font-bold text-slate-900 text-sm">Priya Sharma</h3>
+                <span className="text-xs text-slate-400">Head of Partner Relations</span>
+              </div>
             </div>
-          </div>
-        )}
 
-        {/* Settings Tab */}
-        {activeTab === "Settings" && (
-          <div className="flex flex-col gap-6 max-w-3xl">
-            
-            {/* Notifications */}
-            <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
-              <h3 className="font-bold text-slate-900 mb-5 text-[15px]">Notifications</h3>
-              <div className="flex flex-col gap-5">
-                <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                  <div className="flex items-center gap-4">
-                    <Bell className="w-5 h-5 text-blue-500 shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">Push Notifications</h4>
-                      <p className="text-xs text-slate-500">Receive notifications about case updates</p>
-                    </div>
-                  </div>
-                  {/* Toggle Switch styling */}
-                  <div className="w-11 h-6 bg-blue-500 rounded-full relative cursor-pointer shadow-inner">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1 shadow-sm"></div>
-                  </div>
-                </div>
-                
-                <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                  <div className="flex items-center gap-4">
-                    <Mail className="w-5 h-5 text-blue-500 shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">Email Alerts</h4>
-                      <p className="text-xs text-slate-500">Receive email notifications for important updates</p>
-                    </div>
-                  </div>
-                  <div className="w-11 h-6 bg-blue-500 rounded-full relative cursor-pointer shadow-inner">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 right-1 shadow-sm"></div>
-                  </div>
-                </div>
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Your assigned account manager is available 24/7 for emergency patient escalations, bed approvals, and commission reconciliations.
+            </p>
+
+            <div className="space-y-2.5 text-xs pt-1 border-t border-slate-100">
+              <div className="flex items-center justify-between py-1 text-slate-600">
+                <span className="text-slate-400">Office Hotline</span>
+                <span className="font-semibold text-slate-900">+66 2 026 8800</span>
               </div>
-            </Card>
+              <div className="flex items-center justify-between py-1 text-slate-600">
+                <span className="text-slate-400">Direct Email</span>
+                <span className="font-semibold text-[#0062c4]">priya.s@3smedicare.com</span>
+              </div>
+              <div className="flex items-center justify-between py-1 text-slate-600">
+                <span className="text-slate-400">Availability</span>
+                <span className="font-semibold text-emerald-600 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+                  Available Now
+                </span>
+              </div>
+            </div>
 
-            {/* Security */}
-            <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
-              <h3 className="font-bold text-slate-900 mb-5 text-[15px]">Security</h3>
-              <div className="flex flex-col gap-5">
-                <Button variant="ghost" className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:border-blue-200 transition-colors w-full text-left">
-                  <div className="flex items-center gap-4">
-                    <Lock className="w-5 h-5 text-blue-500 shrink-0" />
-                    <h4 className="text-sm font-bold text-slate-900">Change Password</h4>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400" />
-                </Button>
-                
-                <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                  <div className="flex items-center gap-4">
-                    <Lock className="w-5 h-5 text-blue-500 shrink-0" />
-                    <div>
-                      <h4 className="text-sm font-bold text-slate-900">Two-Factor Authentication</h4>
-                      <p className="text-xs text-slate-500">Add an extra layer of security</p>
-                    </div>
-                  </div>
-                  <div className="w-11 h-6 bg-slate-200 rounded-full relative cursor-pointer shadow-inner">
-                    <div className="w-4 h-4 bg-white rounded-full absolute top-1 left-1 shadow-sm"></div>
-                  </div>
+            <Link
+              href="/support"
+              className="w-full flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-xs py-2.5 rounded-xl transition-colors shadow-xs"
+            >
+              <MessageSquare className="w-3.5 h-3.5" />
+              <span>Contact Manager</span>
+            </Link>
+          </Card>
+
+          {/* Quick Navigation Cards */}
+          <Card className="bg-white rounded-3xl p-5 border border-slate-100 shadow-2xs space-y-2">
+            <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider px-1">
+              Account Management
+            </h4>
+            <Link
+              href="/profile/bank"
+              className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#0062c4] flex items-center justify-center">
+                  <DollarSign className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block group-hover:text-blue-600">
+                    Bank & Payout Details
+                  </span>
+                  <span className="text-[11px] text-slate-400">Standard Chartered Bank</span>
                 </div>
               </div>
-            </Card>
+              <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+            </Link>
 
-            {/* Preferences */}
-            <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
-              <h3 className="font-bold text-slate-900 mb-5 text-[15px]">Preferences</h3>
-              <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl">
-                <div className="flex items-center gap-4">
-                  <Globe className="w-5 h-5 text-blue-500 shrink-0" />
-                  <h4 className="text-sm font-bold text-slate-900">Language</h4>
+            <Link
+              href="/profile/documents"
+              className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center">
+                  <Building2 className="w-4 h-4" />
                 </div>
-                <div className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-700">
-                  English
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block group-hover:text-teal-600">
+                    Compliance Documents
+                  </span>
+                  <span className="text-[11px] text-slate-400">3 of 3 verified</span>
                 </div>
               </div>
-            </Card>
+              <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all" />
+            </Link>
 
-            {/* Legal */}
-            <Card className="p-6 md:p-8 border-none shadow-sm rounded-3xl bg-white">
-              <h3 className="font-bold text-slate-900 mb-5 text-[15px]">Legal</h3>
-              <div className="flex flex-col gap-4 mb-6">
-                <Link href="#" className="text-sm font-bold text-blue-500 hover:text-blue-600">Terms & Conditions</Link>
-                <Link href="#" className="text-sm font-bold text-blue-500 hover:text-blue-600">Privacy Policy</Link>
+            <Link
+              href="/profile/security"
+              className="flex items-center justify-between p-3 rounded-2xl hover:bg-slate-50 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="text-xs font-bold text-slate-800 block group-hover:text-purple-600">
+                    Account Security & 2FA
+                  </span>
+                  <span className="text-[11px] text-slate-400">Protected & active</span>
+                </div>
               </div>
-              <div className="text-[10px] font-semibold text-slate-400 pt-4 border-t border-slate-100">
-                Version 2.1.0 • Last updated May 2026
-              </div>
-            </Card>
-
-          </div>
-        )}
-
+              <ArrowRight className="w-4 h-4 text-slate-300 group-hover:text-purple-600 group-hover:translate-x-0.5 transition-all" />
+            </Link>
+          </Card>
+        </div>
       </div>
     </div>
   );

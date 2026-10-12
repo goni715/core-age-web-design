@@ -164,8 +164,8 @@ export default function CommissionPage() {
                 <span className="text-[10px] font-medium text-slate-400 mb-0.5">Commission</span>
                 <span className="text-xl font-bold text-slate-900">{comm.amount}</span>
               </div>
-              <Link href={`/agent/patients/${comm.caseId}`}>
-                <Button className="bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-5 px-6 rounded-xl shadow-md shadow-blue-200 text-sm">
+              <Link href={`/patients/${comm.caseId}`}>
+                <Button className="bg-[#0062c4] hover:bg-[#0051a8] text-white font-semibold py-5 px-6 rounded-xl shadow-md text-sm">
                   View Details <ArrowRight className="w-4 h-4 ml-1.5" />
                 </Button>
               </Link>

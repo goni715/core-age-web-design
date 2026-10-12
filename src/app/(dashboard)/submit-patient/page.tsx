@@ -87,8 +87,8 @@ export default function SubmitPatientPage() {
             </div>
           </Card>
 
-          <Link href="/agent/submit-patient/success">
-            <Button className="w-full bg-[#2b88ef] hover:bg-blue-600 text-white font-semibold py-7 rounded-xl shadow-md text-base mt-2">
+          <Link href="/submit-patient/success">
+            <Button className="w-full bg-[#ea580c] hover:bg-[#c2410c] text-white font-semibold py-7 rounded-xl shadow-md text-base mt-2">
               Submit Patient Case
             </Button>
           </Link>
