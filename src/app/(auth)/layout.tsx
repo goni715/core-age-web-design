@@ -1,5 +1,6 @@
-import Navbar from "@/components/common/Navbar";
-import Footer from "@/components/common/Footer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
+import PublicRoute from "@/providers/PublicRoute";
 
 export default function MainLayout({
   children,
@@ -7,12 +8,14 @@ export default function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col min-h-screen bg-white">
-      <Navbar />
-      <div className="flex-grow">
-        {children}
+    <PublicRoute>
+      <div className="flex flex-col min-h-screen bg-white">
+        <Navbar />
+        <div className="flex-grow">
+          {children}
+        </div>
+        <Footer />
       </div>
-      <Footer />
-    </div>
+    </PublicRoute>
   );
 }

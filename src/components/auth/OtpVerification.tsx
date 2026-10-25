@@ -36,10 +36,13 @@ export default function OtpVerification() {
           Change Number
         </Button>
 
-        <p className="text-sm text-slate-500 mb-8">
-          Didn't receive the code? <br />
-          <Button className="text-slate-900 font-bold hover:underline mt-1">Resend in 57s</Button>
-        </p>
+        <div className="text-sm text-slate-500 mb-8">
+          <span>Didn't receive the code?</span>
+          <br />
+          <button type="button" className="text-slate-900 font-bold hover:underline mt-1 cursor-pointer">
+            Resend in 57s
+          </button>
+        </div>
 
         <div className="bg-emerald-50/50 text-emerald-700 text-xs py-3 px-4 rounded-lg w-full text-center font-medium">
           Check your spam folder if you don't see the code. <br />

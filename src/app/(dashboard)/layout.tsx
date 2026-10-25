@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, LogOut, Laptop, User } from "lucide-react";
@@ -16,18 +16,43 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { sidebarLinks } from "@/data/sidebar.data";
 import { Button } from "@/components/ui/button";
+import { clearSession } from "@/helpers/SessionHelper";
+import { useLogoutMutation, useLogoutFromAllMutation } from "@/redux/features/auth/authApi";
+import PrivateRoute from "@/providers/PrivateRoute";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
+  const [logout] = useLogoutMutation();
+  const [logoutFromAll] = useLogoutFromAllMutation();
+
+  const handleLogout = async () => {
+    try {
+      await logout({}).unwrap();
+    } catch {
+      clearSession();
+      router.replace("/login");
+    }
+  };
+
+  const handleLogoutAll = async () => {
+    try {
+      await logoutFromAll({}).unwrap();
+    } catch {
+      clearSession();
+      router.replace("/login");
+    }
+  };
+
   const isChannelPartnerSection = pathname === "/my-network" || pathname === "/patients" || pathname.startsWith("/patients/");
   const portalSubtitle = isChannelPartnerSection ? "Channel Partner Portal" : "Referral Partner Portal";
   const reportingRole = isChannelPartnerSection ? "Channel Partner" : "Direct onboarding";
 
   return (
-    <div className="flex min-h-screen bg-[#f4f7fb]">
+    <PrivateRoute>
+      <div className="flex min-h-screen bg-[#f4f7fb]">
       {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
@@ -97,7 +122,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           <button
-            onClick={() => router.push("/login")}
+            onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium text-blue-100/90 hover:text-white hover:bg-white/10 transition-all cursor-pointer group"
           >
             <LogOut className="w-5 h-5 text-blue-200 group-hover:text-white transition-colors" />
@@ -191,7 +216,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -243,7 +268,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -295,7 +320,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -347,7 +372,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -399,7 +424,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -451,7 +476,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -532,7 +557,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
@@ -590,11 +615,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                           <User className="h-4 w-4" />
                           <span className="text-sm">Profile</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
+                        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 hover:bg-slate-50">
                           <LogOut className="h-4 w-4" />
                           <span className="text-sm">Logout</span>
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => router.push('/login')} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50">
+                        <DropdownMenuItem onClick={handleLogoutAll} className="cursor-pointer flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-600 hover:bg-red-50">
                           <Laptop className="h-4 w-4" />
                           <span className="text-sm">Logout from all devices</span>
                         </DropdownMenuItem>
@@ -613,5 +638,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </main>
       </div>
     </div>
+    </PrivateRoute>
   );
 }
