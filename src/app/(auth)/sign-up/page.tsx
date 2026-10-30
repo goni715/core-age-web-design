@@ -12,7 +12,7 @@ export default function SignUpPage() {
           title={
             <>
               Become a<br />
-              Partner Sub-Agent
+              Partner
             </>
           }
           subtitle="Start earning commissions by connecting patients with premium healthcare services worldwide."

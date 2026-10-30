@@ -22,7 +22,8 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { KeyRound, ArrowLeft, RotateCcw, Mail, Edit2 } from "lucide-react";
+import { REGEXP_ONLY_DIGITS } from "input-otp";
+import { KeyRound, ArrowLeft, RotateCcw, Mail, ShieldCheck } from "lucide-react";
 import { isLoggedIn } from "@/helpers/SessionHelper";
 import CustomIconInput from "@/components/common/CustomIconInput";
 
@@ -30,7 +31,6 @@ const VerifyOtpForm = () => {
   const searchParams = useSearchParams();
   const emailFromQuery = searchParams.get("email") || "";
   const [resendCooldown, setResendCooldown] = useState(60);
-  const [isEditingEmail, setIsEditingEmail] = useState(false);
 
   const [verifyAccount, { isLoading }] = useVerifyAccountMutation();
   const [resendOtp, { isLoading: isResending }] = useResendOtpMutation();
@@ -75,8 +75,6 @@ const VerifyOtpForm = () => {
       const storedEmail = sessionStorage.getItem("verifyEmail");
       if (storedEmail) {
         setValue("email", storedEmail);
-      } else {
-        setIsEditingEmail(true);
       }
     }
   }, [emailFromQuery, setValue]);
@@ -117,36 +115,33 @@ const VerifyOtpForm = () => {
     <div className="space-y-6">
       {/* Icon & Heading */}
       <div className="flex flex-col items-center text-center">
-        <div className="w-13 h-13 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 border border-blue-100 shadow-xs">
-          <KeyRound className="w-6 h-6" />
+        <div className="relative mb-4">
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600/10 via-blue-50 to-teal-500/10 border border-blue-100 flex items-center justify-center text-blue-600 shadow-sm">
+            <KeyRound className="w-7 h-7 text-blue-600" />
+          </div>
+          <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-white" />
+          </div>
         </div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-1.5">
+
+        <h2 className="text-2xl font-bold tracking-tight text-slate-900 mb-1">
           Verify OTP
         </h2>
-        <p className="text-slate-500 text-sm">
-          Enter the 6-digit verification code sent to your email.
+        <p className="text-slate-500 text-sm max-w-xs">
+          Enter the 6-digit verification code sent to your email address.
         </p>
-      </div>
 
-      {/* Email Display / Change Box */}
-      {watchedEmail && !isEditingEmail ? (
-        <div className="bg-blue-50/70 border border-blue-100/90 rounded-2xl p-3.5 flex items-center justify-between text-xs text-slate-700">
-          <div className="flex items-center gap-2.5 min-w-0 pr-2">
-            <Mail className="w-4 h-4 text-blue-600 shrink-0" />
-            <span className="truncate font-semibold text-slate-900">
+        {/* Clean Email Badge - "Change" button removed as requested */}
+        {watchedEmail && (
+          <div className="mt-3.5 inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-50/70 border border-blue-100/80 text-xs text-slate-700 max-w-full">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <Mail className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+            <span className="truncate font-semibold text-slate-800">
               {watchedEmail}
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setIsEditingEmail(true)}
-            className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1 shrink-0 cursor-pointer transition-colors"
-          >
-            <Edit2 className="w-3 h-3" />
-            Change
-          </button>
-        </div>
-      ) : null}
+        )}
+      </div>
 
       {/* Error Alert */}
       {VerifyAccountError && (
@@ -158,8 +153,8 @@ const VerifyOtpForm = () => {
 
       {/* Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        {/* Email input if not provided or editing */}
-        {(!watchedEmail || isEditingEmail) && (
+        {/* Email input if not provided */}
+        {!watchedEmail && (
           <CustomIconInput
             label="Email Address"
             name="email"
@@ -173,7 +168,7 @@ const VerifyOtpForm = () => {
         )}
 
         {/* shadcn InputOTP Field */}
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2.5">
           <label className="text-xs sm:text-sm font-semibold text-slate-700 text-center">
             Verification Code
           </label>
@@ -185,36 +180,24 @@ const VerifyOtpForm = () => {
               <div className="flex flex-col items-center gap-2">
                 <InputOTP
                   maxLength={6}
+                  pattern={REGEXP_ONLY_DIGITS}
+                  inputMode="numeric"
                   value={field.value}
-                  onChange={field.onChange}
+                  onChange={(val) => {
+                    const numericOnly = val.replace(/\D/g, "");
+                    field.onChange(numericOnly);
+                  }}
                   disabled={isLoading}
                   autoFocus
                 >
                   <InputOTPGroup className="gap-2 sm:gap-2.5">
-                    <InputOTPSlot
-                      index={0}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl font-bold rounded-xl border border-slate-200 focus-visible:border-blue-500 focus-visible:ring-3 focus-visible:ring-blue-100 bg-white"
-                    />
-                    <InputOTPSlot
-                      index={1}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl font-bold rounded-xl border border-slate-200 focus-visible:border-blue-500 focus-visible:ring-3 focus-visible:ring-blue-100 bg-white"
-                    />
-                    <InputOTPSlot
-                      index={2}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl font-bold rounded-xl border border-slate-200 focus-visible:border-blue-500 focus-visible:ring-3 focus-visible:ring-blue-100 bg-white"
-                    />
-                    <InputOTPSlot
-                      index={3}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl font-bold rounded-xl border border-slate-200 focus-visible:border-blue-500 focus-visible:ring-3 focus-visible:ring-blue-100 bg-white"
-                    />
-                    <InputOTPSlot
-                      index={4}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl font-bold rounded-xl border border-slate-200 focus-visible:border-blue-500 focus-visible:ring-3 focus-visible:ring-blue-100 bg-white"
-                    />
-                    <InputOTPSlot
-                      index={5}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl font-bold rounded-xl border border-slate-200 focus-visible:border-blue-500 focus-visible:ring-3 focus-visible:ring-blue-100 bg-white"
-                    />
+                    {[0, 1, 2, 3, 4, 5].map((index) => (
+                      <InputOTPSlot
+                        key={index}
+                        index={index}
+                        className="w-[46px] h-[54px] sm:w-[52px] sm:h-[60px] text-xl sm:text-2xl font-bold rounded-xl sm:rounded-2xl border-2 border-slate-300 bg-white text-slate-900 shadow-2xs transition-all duration-150 hover:border-slate-400 data-[active=true]:border-blue-600 data-[active=true]:ring-4 data-[active=true]:ring-blue-500/15 data-[active=true]:shadow-md data-[active=true]:scale-105"
+                      />
+                    ))}
                   </InputOTPGroup>
                 </InputOTP>
 
@@ -232,34 +215,52 @@ const VerifyOtpForm = () => {
         <SubmitButton
           isLoading={isLoading}
           loadingTitle="Verifying code..."
-          className="h-11 text-sm font-semibold bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white shadow-md hover:shadow-lg transition-all rounded-xl"
+          className="h-12 text-sm font-semibold bg-gradient-to-r from-blue-600 via-blue-700 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 rounded-xl"
         >
           Verify Code
         </SubmitButton>
 
         {/* Resend & Back Actions */}
-        <div className="flex flex-col items-center justify-center pt-2 gap-3.5 text-center">
-          <p className="text-xs sm:text-sm text-slate-500 font-medium">
-            Didn&apos;t receive the code?{" "}
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={resendCooldown > 0 || isResending}
-              className="text-blue-600 font-bold hover:underline outline-none disabled:text-slate-400 disabled:no-underline cursor-pointer transition-colors"
-            >
-              {resendCooldown > 0
-                ? `Resend in ${resendCooldown}s`
-                : "Resend Code"}
-            </button>
-          </p>
+        <div className="flex flex-col items-center justify-center pt-1 gap-3.5 text-center">
+          <div className="text-xs sm:text-sm text-slate-500 font-medium">
+            {resendCooldown > 0 ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-600 text-xs font-medium">
+                <RotateCcw className="w-3.5 h-3.5 text-slate-400" />
+                Resend code in{" "}
+                <strong className="text-slate-900 tabular-nums font-semibold">
+                  {resendCooldown}s
+                </strong>
+              </span>
+            ) : (
+              <div className="flex items-center gap-1.5">
+                <span>Didn&apos;t receive the code?</span>
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={isResending}
+                  className="text-blue-600 font-bold hover:underline outline-none cursor-pointer inline-flex items-center gap-1 transition-colors"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  {isResending ? "Sending..." : "Resend Code"}
+                </button>
+              </div>
+            )}
+          </div>
 
           <Link
             href="/login"
-            className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-blue-600 transition-colors"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-slate-600 hover:text-blue-600 group transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
             Back to Login
           </Link>
+        </div>
+
+        {/* Subtle Help Hint */}
+        <div className="pt-2 border-t border-slate-100">
+          <p className="text-[11px] text-slate-400 text-center leading-relaxed">
+            Can&apos;t find the verification email? Check your spam or promotions folder.
+          </p>
         </div>
       </form>
     </div>

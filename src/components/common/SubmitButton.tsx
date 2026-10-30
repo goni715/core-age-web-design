@@ -9,6 +9,7 @@ type TProps = {
   type?: "submit" | "button";
   children: React.ReactNode;
   className?: string;
+  style?: React.CSSProperties;
   disabled?: boolean;
   variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "link";
   size?: "default" | "xs" | "sm" | "lg" | "icon";
@@ -20,6 +21,7 @@ const SubmitButton = ({
   type = "submit",
   children,
   className,
+  style,
   disabled = false,
   variant = "default",
   size = "lg",
@@ -29,6 +31,7 @@ const SubmitButton = ({
       type={type}
       variant={variant}
       size={size}
+      style={style}
       disabled={isLoading || disabled}
       className={cn(
         "w-full font-medium text-sm transition-all duration-200 cursor-pointer flex items-center justify-center gap-2",

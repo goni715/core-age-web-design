@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, LogOut, Laptop, User } from "lucide-react";
+import { Menu, X, LogOut, Laptop, User, Check, Loader2 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -18,6 +18,8 @@ import { sidebarLinks } from "@/data/sidebar.data";
 import { Button } from "@/components/ui/button";
 import { clearSession } from "@/helpers/SessionHelper";
 import { useLogoutMutation, useLogoutFromAllMutation } from "@/redux/features/auth/authApi";
+import { useGenerateInvitationLinkMutation } from "@/redux/features/referralPartner/referralPartnerApi";
+import { SuccessToast, ErrorToast } from "@/helpers/ValidationHelper";
 import PrivateRoute from "@/providers/PrivateRoute";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -27,6 +29,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const [logout] = useLogoutMutation();
   const [logoutFromAll] = useLogoutFromAllMutation();
+  const [generateInvitationLink, { isLoading: isGeneratingInviteLink }] =
+    useGenerateInvitationLinkMutation();
+  const [copiedInviteLink, setCopiedInviteLink] = useState(false);
+
+  const handleInvitePartner = async () => {
+    try {
+      const res = await generateInvitationLink().unwrap();
+      const link = res?.data?.invitationLink;
+      if (link) {
+        await navigator.clipboard?.writeText(link);
+        setCopiedInviteLink(true);
+        SuccessToast("Invitation link copied to clipboard!");
+        setTimeout(() => setCopiedInviteLink(false), 2000);
+      }
+    } catch {
+      ErrorToast("Failed to generate invitation link. Please try again.");
+    }
+  };
+
 
   const handleLogout = async () => {
     try {
@@ -163,15 +184,26 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
                 <div className="flex items-center gap-3">
                   <button
-                    onClick={() => {
-                      navigator.clipboard?.writeText("https://medicare.partner.com/invite/CP-8841");
-                      alert("Invitation link copied to clipboard: https://medicare.partner.com/invite/CP-8841");
-                    }}
-                    className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-semibold text-xs sm:text-sm py-2.5 px-4 sm:px-5 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                    onClick={handleInvitePartner}
+                    disabled={isGeneratingInviteLink}
+                    className="bg-[#ea580c] hover:bg-[#c2410c] text-white font-semibold text-xs sm:text-sm py-2.5 px-4 sm:px-5 rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-70"
                   >
-                    <span>+ Invite referral partner</span>
+                    {copiedInviteLink ? (
+                      <>
+                        <Check className="w-4 h-4" />
+                        <span>Link copied!</span>
+                      </>
+                    ) : isGeneratingInviteLink ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <span>Generating...</span>
+                      </>
+                    ) : (
+                      <span>+ Invite referral partner</span>
+                    )}
                   </button>
                 </div>
+
               </>
             ) : pathname === "/healthcare-network" ? (
               <>

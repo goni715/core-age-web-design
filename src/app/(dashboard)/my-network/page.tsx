@@ -1,21 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, ChevronRight, Check } from "lucide-react";
+import { Search, ChevronRight, Check, Loader2 } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { useGenerateInvitationLinkMutation } from "@/redux/features/referralPartner/referralPartnerApi";
+import { SuccessToast, ErrorToast } from "@/helpers/ValidationHelper";
 
 export default function MyNetworkPage() {
   const [activeTab, setActiveTab] = useState("All (24)");
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedLink, setCopiedLink] = useState(false);
+  const [invitationLink, setInvitationLink] = useState<string>("");
 
-  const inviteUrl = "https://medicare.partner.com/invite/CP-8841";
+  const [generateInvitationLink, { isLoading: isGeneratingLink }] =
+    useGenerateInvitationLinkMutation();
 
-  const handleCopyLink = () => {
-    navigator.clipboard?.writeText(inviteUrl);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+  // Auto-fetch the referral invitation link when the page loads
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLink = async () => {
+      try {
+        const res = await generateInvitationLink().unwrap();
+        if (isMounted && res?.data?.invitationLink) {
+          setInvitationLink(res.data.invitationLink);
+        }
+      } catch {
+        // Fallback placeholder if not generated yet
+      }
+    };
+    fetchLink();
+    return () => {
+      isMounted = false;
+    };
+  }, [generateInvitationLink]);
+
+  const handleCopyLink = async () => {
+    let linkToCopy = invitationLink;
+    if (!linkToCopy) {
+      try {
+        const res = await generateInvitationLink().unwrap();
+        if (res?.data?.invitationLink) {
+          linkToCopy = res.data.invitationLink;
+          setInvitationLink(linkToCopy);
+        }
+      } catch {
+        ErrorToast("Failed to generate invitation link. Please try again.");
+        return;
+      }
+    }
+
+    if (linkToCopy) {
+      try {
+        await navigator.clipboard?.writeText(linkToCopy);
+        setCopiedLink(true);
+        SuccessToast("Invitation link copied to clipboard!");
+        setTimeout(() => setCopiedLink(false), 2000);
+      } catch {
+        ErrorToast("Failed to copy link to clipboard");
+      }
+    }
   };
 
   const tabs = [
@@ -24,6 +68,7 @@ export default function MyNetworkPage() {
     { label: "Invited (3)", key: "Invited" },
     { label: "Paused (0)", key: "Paused" },
   ];
+
 
   const partners = [
     {
@@ -338,18 +383,29 @@ export default function MyNetworkPage() {
           <input
             type="text"
             readOnly
-            value="Your invitation link will appear here"
-            className="bg-white border border-slate-200/90 rounded-xl px-4 py-2.5 text-xs text-slate-500 w-full sm:w-64 md:w-72 shadow-2xs focus:outline-hidden"
+            value={
+              isGeneratingLink && !invitationLink
+                ? "Generating invitation link..."
+                : invitationLink || "Click 'Copy link' to generate link"
+            }
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+            className="bg-white border border-slate-200/90 rounded-xl px-4 py-2.5 text-xs text-slate-700 font-medium w-full sm:w-72 md:w-80 shadow-2xs focus:outline-hidden select-all"
           />
 
           <button
             onClick={handleCopyLink}
-            className="bg-[#005ca9] hover:bg-[#004e90] text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer"
+            disabled={isGeneratingLink && !invitationLink}
+            className="bg-[#005ca9] hover:bg-[#004e90] text-white font-semibold text-xs px-5 py-2.5 rounded-xl shadow-xs transition-colors shrink-0 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-60"
           >
             {copiedLink ? (
               <>
                 <Check className="w-3.5 h-3.5" />
                 <span>Copied!</span>
+              </>
+            ) : isGeneratingLink && !invitationLink ? (
+              <>
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                <span>Generating...</span>
               </>
             ) : (
               <span>Copy link</span>
@@ -357,6 +413,7 @@ export default function MyNetworkPage() {
           </button>
         </div>
       </Card>
+
     </div>
   );
 }

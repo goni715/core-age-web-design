@@ -36,7 +36,9 @@ export default function VerifyOtpPage() {
 
         {/* Right Side: Modular Verify OTP Form */}
         <div className="flex justify-center lg:justify-end w-full">
-          <div className="bg-white w-full max-w-[480px] p-8 md:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-slate-100">
+          <div className="relative bg-white w-full max-w-[480px] p-8 md:p-10 rounded-3xl shadow-[0_20px_50px_rgba(15,23,42,0.06)] border border-slate-100 overflow-hidden">
+            {/* Top decorative gradient bar */}
+            <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-blue-600 via-teal-400 to-blue-500" />
             <Suspense
               fallback={
                 <div className="py-12 text-center text-sm text-slate-400">

@@ -13,7 +13,13 @@ import {
   SetVerifyOtpError,
 } from "./authSlice";
 import TagTypes from "@/constants/tagType.constant";
-import { removeToken, setToken, setUserInfo, removeUserInfo, clearSession } from "@/helpers/SessionHelper";
+import {
+  removeToken,
+  setToken,
+  setRefreshToken,
+  setUserInfo,
+  clearSession,
+} from "@/helpers/SessionHelper";
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -27,18 +33,70 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const res = await queryFulfilled;
           const token = res?.data?.data?.accessToken;
+          const refreshToken = res?.data?.data?.refreshToken;
           removeToken();
           setToken(token);
-          const { fullName, email, profileImg, role } = res?.data?.data || {};
-          setUserInfo({ fullName, email, profileImg, role });
-          SuccessToast("Login Successfull");
+          if (refreshToken) {
+            setRefreshToken(refreshToken);
+          }
+          const { fullName, email, profileImg, role, phone, _id } =
+            res?.data?.data || {};
+          setUserInfo({
+            fullName: fullName || "Agent",
+            email: email || "",
+            profileImg: profileImg || "",
+            role: role || "agent",
+            phone,
+            _id,
+          });
+          SuccessToast(res?.data?.message || "Login Successful");
         } catch (err: any) {
           const status = err?.error?.status;
           const message = err?.error?.data?.message || "Something Went Wrong";
           if (status === 500) {
             dispatch(SetLoginError("Something Went Wrong"));
+          } else {
+            dispatch(SetLoginError(message));
           }
-          else {
+        }
+      },
+    }),
+    loginSubAgent: builder.mutation({
+      query: (data) => ({
+        url: "/auth/login-sub-agent",
+        method: "POST",
+        body: data,
+      }),
+      async onQueryStarted(_arg, { queryFulfilled, dispatch }) {
+        try {
+          const res = await queryFulfilled;
+          const token = res?.data?.data?.accessToken;
+          const refreshToken = res?.data?.data?.refreshToken;
+          removeToken();
+          setToken(token);
+          if (refreshToken) {
+            setRefreshToken(refreshToken);
+          }
+          const { fullName, name, email, profileImg, role, phone, _id } =
+            res?.data?.data || {};
+          setUserInfo({
+            fullName: fullName || name || "Sub-Agent",
+            email: email || "",
+            profileImg: profileImg || "",
+            role: role || "sub-agent",
+            phone,
+            _id,
+          });
+          SuccessToast(
+            res?.data?.message || "Sub-Agent logged in successfully"
+          );
+        } catch (err: any) {
+          const status = err?.error?.status;
+          const message =
+            err?.error?.data?.message || "Invalid email or password";
+          if (status === 500) {
+            dispatch(SetLoginError("Something Went Wrong"));
+          } else {
             dispatch(SetLoginError(message));
           }
         }
@@ -287,16 +345,23 @@ export const authApi = apiSlice.injectEndpoints({
         try {
           const res = await queryFulfilled;
           const token = res?.data?.data?.accessToken;
+          const refreshToken = res?.data?.data?.refreshToken;
           if (token) {
             removeToken();
             setToken(token);
-            const { fullName, email, profileImg, role } = res?.data?.data || {};
-            setUserInfo({ fullName, email, profileImg, role });
+            if (refreshToken) {
+              setRefreshToken(refreshToken);
+            }
+            const { fullName, email, profileImg, role, phone, _id } =
+              res?.data?.data || {};
+            setUserInfo({ fullName, email, profileImg, role, phone, _id });
           }
           SuccessToast(res?.data?.message || "Account verified successfully!");
         } catch (err: any) {
           const status = err?.error?.status;
-          const message = err?.error?.data?.message || "Verification failed. Invalid or expired code.";
+          const message =
+            err?.error?.data?.message ||
+            "Verification failed. Invalid or expired code.";
           if (status === 500) {
             dispatch(SetVerifyAccountError("Something Went Wrong"));
           } else {
@@ -310,6 +375,7 @@ export const authApi = apiSlice.injectEndpoints({
 
 export const {
   useLoginMutation,
+  useLoginSubAgentMutation,
   useRegisterAgentMutation,
   useVerifyAccountMutation,
   useLogoutMutation,

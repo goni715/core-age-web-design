@@ -72,7 +72,28 @@ export const verifyAccountSchema = z.object({
   otp: z
     .string()
     .min(6, "Please enter all 6 digits of the verification code")
-    .max(6, "OTP must not exceed 6 digits"),
+    .max(6, "OTP must not exceed 6 digits")
+    .regex(/^\d{6}$/, "Verification code must contain only numbers"),
 });
 
 export type TVerifyAccountValues = z.infer<typeof verifyAccountSchema>;
+
+export const subAgentRegisterSchema = z
+  .object({
+    fullName: fullNameZodSchema,
+    agencyName: requiredStringSchema("Agency / Clinic name"),
+    email: emailZodSchema,
+    phone: phoneNumberZodSchema,
+    referralToken: z.string().min(1, "Referral token is required"),
+    password: passwordZodSchema,
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+    termsAccepted: z.boolean().refine((val) => val === true, {
+      message: "You must accept the Terms of Service & Sub-Agent Agreement",
+    }),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+export type TSubAgentRegisterValues = z.infer<typeof subAgentRegisterSchema>;

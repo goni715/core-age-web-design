@@ -70,18 +70,42 @@ export const AuthorizationLoader: React.FC<AuthorizationLoaderProps> = ({
     );
   }
 
+  const isSubAgent = pathname.startsWith("/sub-agent");
+
   // Dashboard Layout Skeleton
   return (
     <div
       role="status"
       aria-label="Loading dashboard..."
-      className={cn("min-h-screen bg-slate-50/50 w-full select-none", className)}
+      className={cn(
+        "min-h-screen w-full select-none",
+        isSubAgent ? "bg-[#f3f9f8]" : "bg-slate-50/50",
+        className
+      )}
     >
       {/* Sidebar Skeleton (Desktop) */}
-      <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-slate-100 bg-white flex-col hidden md:flex">
+      <aside
+        style={isSubAgent ? { backgroundColor: "#0d5c56" } : undefined}
+        className={cn(
+          "fixed left-0 top-0 z-40 h-screen w-64 border-r flex-col hidden md:flex",
+          isSubAgent
+            ? "bg-[#0d5c56] border-white/10 text-white"
+            : "border-slate-100 bg-white"
+        )}
+      >
         {/* Brand/Logo Area */}
-        <div className="flex h-[88px] items-center justify-center px-6 border-b border-slate-100 shrink-0">
-          <Skeleton className="h-12 w-44 rounded-xl" />
+        <div
+          className={cn(
+            "flex h-[88px] items-center justify-center px-6 border-b shrink-0",
+            isSubAgent ? "border-white/10" : "border-slate-100"
+          )}
+        >
+          <Skeleton
+            className={cn(
+              "h-12 w-44 rounded-xl",
+              isSubAgent ? "bg-white/20" : "bg-muted"
+            )}
+          />
         </div>
 
         {/* Navigation Items Skeleton */}
@@ -94,25 +118,55 @@ export const AuthorizationLoader: React.FC<AuthorizationLoaderProps> = ({
             { w: "w-32" },
             { w: "w-24" },
             { w: "w-20" },
-            { w: "w-24" },
-            { w: "w-20" },
-            { w: "w-20" },
           ].map((item, idx) => (
             <div
               key={idx}
-              className="flex items-center gap-3 rounded-xl px-4 py-[13px] bg-slate-50/50"
+              className={cn(
+                "flex items-center gap-3 rounded-xl px-4 py-[13px]",
+                isSubAgent ? "bg-white/10" : "bg-slate-50/50"
+              )}
             >
-              <Skeleton className="h-5 w-5 rounded-md shrink-0" />
-              <Skeleton className={`h-4 ${item.w} rounded`} />
+              <Skeleton
+                className={cn(
+                  "h-5 w-5 rounded-md shrink-0",
+                  isSubAgent ? "bg-white/20" : "bg-muted"
+                )}
+              />
+              <Skeleton
+                className={cn(
+                  `h-4 ${item.w} rounded`,
+                  isSubAgent ? "bg-white/20" : "bg-muted"
+                )}
+              />
             </div>
           ))}
         </div>
 
         {/* Bottom Logout Button Skeleton */}
-        <div className="border-t border-slate-100 p-4 shrink-0">
-          <div className="flex items-center gap-3 rounded-xl px-4 py-3 bg-slate-50/60">
-            <Skeleton className="h-5 w-5 rounded-md bg-rose-200/50" />
-            <Skeleton className="h-4 w-20 rounded bg-rose-200/50" />
+        <div
+          className={cn(
+            "border-t p-4 shrink-0",
+            isSubAgent ? "border-white/10" : "border-slate-100"
+          )}
+        >
+          <div
+            className={cn(
+              "flex items-center gap-3 rounded-xl px-4 py-3",
+              isSubAgent ? "bg-white/10" : "bg-slate-50/60"
+            )}
+          >
+            <Skeleton
+              className={cn(
+                "h-5 w-5 rounded-md",
+                isSubAgent ? "bg-white/20" : "bg-rose-200/50"
+              )}
+            />
+            <Skeleton
+              className={cn(
+                "h-4 w-20 rounded",
+                isSubAgent ? "bg-white/20" : "bg-rose-200/50"
+              )}
+            />
           </div>
         </div>
       </aside>
@@ -120,15 +174,42 @@ export const AuthorizationLoader: React.FC<AuthorizationLoaderProps> = ({
       {/* Main Content Area Skeleton */}
       <div className="flex flex-col md:pl-64">
         {/* Header Skeleton */}
-        <header className="sticky top-0 z-30 flex h-[88px] w-full items-center justify-between border-b border-slate-100 bg-white/80 px-8 backdrop-blur-md">
+        <header
+          className={cn(
+            "sticky top-0 z-30 flex h-[88px] w-full items-center justify-between border-b px-8 backdrop-blur-md",
+            isSubAgent
+              ? "bg-[#f3f9f8]/90 border-teal-200/50"
+              : "border-slate-100 bg-white/80"
+          )}
+        >
           <div className="flex flex-col gap-1.5">
-            <Skeleton className="h-6 w-36 rounded-lg" />
-            <Skeleton className="h-3.5 w-72 rounded hidden sm:block bg-slate-100" />
+            <Skeleton
+              className={cn(
+                "h-6 w-36 rounded-lg",
+                isSubAgent ? "bg-teal-200/60" : "bg-muted"
+              )}
+            />
+            <Skeleton
+              className={cn(
+                "h-3.5 w-72 rounded hidden sm:block",
+                isSubAgent ? "bg-teal-100/50" : "bg-slate-100"
+              )}
+            />
           </div>
 
           <div className="flex items-center gap-3">
-            <Skeleton className="h-10 w-10 rounded-full" />
-            <Skeleton className="h-4 w-20 rounded hidden sm:block" />
+            <Skeleton
+              className={cn(
+                "h-10 w-10 rounded-full",
+                isSubAgent ? "bg-teal-200/60" : "bg-muted"
+              )}
+            />
+            <Skeleton
+              className={cn(
+                "h-4 w-20 rounded hidden sm:block",
+                isSubAgent ? "bg-teal-200/60" : "bg-muted"
+              )}
+            />
           </div>
         </header>
 
@@ -136,12 +217,42 @@ export const AuthorizationLoader: React.FC<AuthorizationLoaderProps> = ({
         <main className="flex-1 p-8">
           <div className="flex flex-col gap-6 max-w-[1400px] mx-auto">
             {/* Welcome Banner Skeleton */}
-            <div className="h-28 rounded-2xl bg-white border border-slate-100 p-6 flex items-center justify-between shadow-xs">
+            <div
+              style={
+                isSubAgent
+                  ? {
+                      background:
+                        "linear-gradient(135deg, #0d5c56 0%, #0f766e 45%, #059669 100%)",
+                    }
+                  : undefined
+              }
+              className={cn(
+                "h-28 rounded-2xl p-6 flex items-center justify-between shadow-xs",
+                isSubAgent
+                  ? "border border-teal-800 text-white"
+                  : "bg-white border border-slate-100"
+              )}
+            >
               <div className="space-y-2">
-                <Skeleton className="h-6 w-56 rounded-lg" />
-                <Skeleton className="h-4 w-80 rounded bg-slate-100 hidden sm:block" />
+                <Skeleton
+                  className={cn(
+                    "h-6 w-56 rounded-lg",
+                    isSubAgent ? "bg-white/20" : "bg-muted"
+                  )}
+                />
+                <Skeleton
+                  className={cn(
+                    "h-4 w-80 rounded hidden sm:block",
+                    isSubAgent ? "bg-white/15" : "bg-slate-100"
+                  )}
+                />
               </div>
-              <Skeleton className="h-10 w-28 rounded-xl bg-slate-100 hidden md:block" />
+              <Skeleton
+                className={cn(
+                  "h-10 w-28 rounded-xl hidden md:block",
+                  isSubAgent ? "bg-white/20" : "bg-slate-100"
+                )}
+              />
             </div>
 
             {/* Stats Grid Skeleton (4 cards) */}
@@ -149,11 +260,21 @@ export const AuthorizationLoader: React.FC<AuthorizationLoaderProps> = ({
               {[1, 2, 3, 4].map((i) => (
                 <div
                   key={i}
-                  className="h-28 rounded-2xl bg-white border border-slate-100 p-5 shadow-xs flex flex-col justify-between"
+                  className={cn(
+                    "h-28 rounded-2xl bg-white p-5 shadow-xs flex flex-col justify-between",
+                    isSubAgent
+                      ? "border border-teal-100"
+                      : "border border-slate-100"
+                  )}
                 >
                   <div className="flex items-center justify-between">
                     <Skeleton className="h-3.5 w-24 rounded" />
-                    <Skeleton className="h-8 w-8 rounded-xl bg-blue-100/60" />
+                    <Skeleton
+                      className={cn(
+                        "h-8 w-8 rounded-xl",
+                        isSubAgent ? "bg-teal-100/60" : "bg-blue-100/60"
+                      )}
+                    />
                   </div>
                   <div className="space-y-1">
                     <Skeleton className="h-7 w-20 rounded-md" />

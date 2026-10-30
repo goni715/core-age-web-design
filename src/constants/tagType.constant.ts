@@ -10,6 +10,9 @@ const TagTypes = {
     CONTENT: "Content",
     PROFILE: "Profile",
     DASHBOARD: "Dashboard",
+    REFERRAL_PARTNER: "ReferralPartner",
+    PATIENT_CASES: "PatientCases",
+    MY_NETWORKS: "MyNetworks",
 } as const;
 
-export default TagTypes;
+export default TagTypes;

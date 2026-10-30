@@ -109,7 +109,7 @@ const RegisterForm = () => {
           label="Agency / Business Name"
           name="agencyName"
           control={control}
-          placeholder="e.g. Goni Tech Agency"
+          placeholder="e.g. Tech Agency"
           icon={Briefcase}
           disabled={isRegistering}
           required
@@ -166,7 +166,12 @@ const RegisterForm = () => {
         <SubmitButton
           isLoading={isRegistering}
           loadingTitle="Creating account..."
-          className="h-11 text-sm font-semibold bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 text-white shadow-md hover:shadow-lg transition-all rounded-xl mt-2"
+          style={{
+            background: "linear-gradient(135deg, #005ca9 0%, #1d4ed8 100%)",
+            color: "#ffffff",
+            boxShadow: "0 4px 14px 0 rgba(0, 92, 169, 0.35)",
+          }}
+          className="h-11 text-sm font-semibold !text-white shadow-md hover:shadow-lg transition-all rounded-xl mt-2 cursor-pointer hover:opacity-95"
         >
           Create Account
         </SubmitButton>

@@ -1,11 +1,33 @@
-import { LayoutDashboard, Share2, Users, DollarSign, Globe, MessageSquare, User } from "lucide-react";
+import {
+  LayoutDashboard,
+  Share2,
+  Users,
+  DollarSign,
+  Globe,
+  MessageSquare,
+  User,
+  UserPlus,
+} from "lucide-react";
 
-export const sidebarLinks = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "My Network", href: "/my-network", icon: Share2 },
-    { name: "Patients", href: "/patients", icon: Users },
-    { name: "Commission", href: "/commission", icon: DollarSign },
-    { name: "Healthcare Network", href: "/healthcare-network", icon: Globe },
-    { name: "Support", href: "/support", icon: MessageSquare },
-    { name: "Profile", href: "/profile", icon: User },
-];
+export const agentSidebarLinks = [
+  { name: "Dashboard", href: "/agent/dashboard", icon: LayoutDashboard },
+  { name: "My Network", href: "/agent/my-network", icon: Share2 },
+  { name: "Patients", href: "/agent/patients", icon: Users },
+  { name: "Submit Patient", href: "/agent/submit-patient", icon: UserPlus },
+  { name: "Commission", href: "/agent/commission", icon: DollarSign },
+  { name: "Healthcare Network", href: "/agent/healthcare-network", icon: Globe },
+  { name: "Support", href: "/agent/support", icon: MessageSquare },
+  { name: "Profile", href: "/agent/profile", icon: User },
+];
+
+export const subAgentSidebarLinks = [
+  { name: "Dashboard", href: "/sub-agent/dashboard", icon: LayoutDashboard },
+  { name: "My Cases", href: "/sub-agent/patients", icon: Users },
+  { name: "Submit Patient", href: "/sub-agent/submit-patient", icon: UserPlus },
+  { name: "Earnings", href: "/sub-agent/commission", icon: DollarSign },
+  { name: "Healthcare Network", href: "/sub-agent/healthcare-network", icon: Globe },
+  { name: "Support", href: "/sub-agent/support", icon: MessageSquare },
+  { name: "Profile", href: "/sub-agent/profile", icon: User },
+];
+
+export const sidebarLinks = agentSidebarLinks;

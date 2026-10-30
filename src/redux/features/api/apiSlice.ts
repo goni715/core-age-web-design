@@ -2,7 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { BASE_URL } from "@/constants/global.constant";
 import TagTypes from "@/constants/tagType.constant";
-import { getToken, removeToken, setToken } from "@/helpers/SessionHelper";
+import { getToken, setToken, setRefreshToken, clearSession } from "@/helpers/SessionHelper";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
@@ -22,23 +22,35 @@ export const apiSlice = createApi({
     baseQuery: async (args, api, extraOptions) => {
         let result = await baseQuery(args, api, extraOptions);
         if (result?.error?.status === 401) {
-            //console.log(`Sending Refresh Token`);
-            const res = await fetch(`${BASE_URL}/auth/refresh-token`, {
-                method: 'POST',
-                credentials: 'include'
-            });
+            // Refresh Token automatically included in cookies or called
+            try {
+                const res = await fetch(`${BASE_URL}/auth/refresh-token`, {
+                    method: 'POST',
+                    credentials: 'include'
+                });
 
-            const data = await res.json();
+                const data = await res.json();
 
-            if (data?.data?.accessToken) {
-                setToken(data?.data?.accessToken);
-                // Retry the original query with the new access token
-                result = await baseQuery(args, api, extraOptions);
-            }
-            else {
-                //invalid or expired refreshToken
-                removeToken()
-                window.location.href = "/login";
+                if (data?.data?.accessToken) {
+                    setToken(data?.data?.accessToken);
+                    if (data?.data?.refreshToken) {
+                        setRefreshToken(data?.data?.refreshToken);
+                    }
+                    // Retry the original query with the new access token
+                    result = await baseQuery(args, api, extraOptions);
+                }
+                else {
+                    // Invalid or expired refreshToken
+                    clearSession();
+                    if (typeof window !== "undefined") {
+                        window.location.href = "/login";
+                    }
+                }
+            } catch {
+                clearSession();
+                if (typeof window !== "undefined") {
+                    window.location.href = "/login";
+                }
             }
         }
         return result;
