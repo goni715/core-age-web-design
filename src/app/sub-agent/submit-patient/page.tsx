@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Upload,
+  Link as LinkIcon,
   UserPlus,
   FileText,
   CheckCircle2,
@@ -65,12 +65,10 @@ export default function SubAgentSubmitPatientPage() {
     preferredCountry: "India",
     budgetRange: "$3,000 - $8,000",
     symptoms: "",
+    driveLink: "",
   });
 
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
-  const [isDragging, setIsDragging] = useState(false);
   const [customBudget, setCustomBudget] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (
@@ -91,70 +89,6 @@ export default function SubAgentSubmitPatientPage() {
         return updated;
       });
     }
-  };
-
-  const processFiles = (incomingFiles: File[]) => {
-    if (!incomingFiles || incomingFiles.length === 0) return;
-
-    const validFiles: File[] = [];
-
-    for (const file of incomingFiles) {
-      const isPdf =
-        file.name.toLowerCase().endsWith(".pdf") ||
-        file.type.toLowerCase().includes("pdf") ||
-        file.type === "application/x-pdf" ||
-        file.type === "application/octet-stream";
-
-      if (!isPdf) {
-        ErrorToast(`"${file.name}" is not a PDF file. Please upload PDF format only.`);
-        continue;
-      }
-
-      if (file.size > 10 * 1024 * 1024) {
-        ErrorToast(`"${file.name}" exceeds the 10MB limit.`);
-        continue;
-      }
-
-      const isDuplicate = files.some(
-        (existing) => existing.name === file.name && existing.size === file.size
-      );
-      if (isDuplicate) {
-        continue;
-      }
-
-      validFiles.push(file);
-    }
-
-    if (validFiles.length === 0) return;
-
-    const combined = [...files, ...validFiles];
-    if (combined.length > 2) {
-      ErrorToast("Maximum 2 PDF reports allowed. Retaining first 2 files.");
-      setFiles(combined.slice(0, 2));
-    } else {
-      setFiles(combined);
-    }
-
-    if (errors.reports) {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated.reports;
-        return updated;
-      });
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      processFiles(Array.from(e.target.files));
-    }
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
-
-  const removeFile = (index: number) => {
-    setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   const validateForm = (): boolean => {
@@ -200,10 +134,12 @@ export default function SubAgentSubmitPatientPage() {
       newErrors.symptoms = "Please provide more details about the symptoms (min 5 characters)";
     }
 
-    if (files.length === 0) {
-      newErrors.reports = "At least 1 medical report (PDF format, max 2) is required";
-    } else if (files.length > 2) {
-      newErrors.reports = "Maximum 2 PDF files are allowed";
+    if (formData.driveLink.trim()) {
+      try {
+        new URL(formData.driveLink.trim());
+      } catch {
+        newErrors.driveLink = "Please enter a valid URL (e.g. https://drive.google.com/...)";
+      }
     }
 
     setErrors(newErrors);
@@ -220,22 +156,32 @@ export default function SubAgentSubmitPatientPage() {
 
     try {
       const cleanPhone = formData.phone.replace(/[\s\-()]/g, "");
-      const formPayload = new FormData();
+      const payload: {
+        fullName: string;
+        phone: string;
+        age: number;
+        gender: string;
+        treatmentType: string;
+        preferredCountry: string;
+        budgetRange: string;
+        symptoms: string;
+        driveLink?: string;
+      } = {
+        fullName: formData.fullName.trim(),
+        phone: cleanPhone,
+        age: Math.floor(Number(formData.age)),
+        gender: formData.gender.toLowerCase(),
+        treatmentType: formData.treatmentType.trim(),
+        preferredCountry: formData.preferredCountry.trim(),
+        budgetRange: formData.budgetRange.trim(),
+        symptoms: formData.symptoms.trim(),
+      };
 
-      formPayload.append("fullName", formData.fullName.trim());
-      formPayload.append("phone", cleanPhone);
-      formPayload.append("age", String(Math.floor(Number(formData.age))));
-      formPayload.append("gender", formData.gender.toLowerCase());
-      formPayload.append("treatmentType", formData.treatmentType.trim());
-      formPayload.append("preferredCountry", formData.preferredCountry.trim());
-      formPayload.append("budgetRange", formData.budgetRange.trim());
-      formPayload.append("symptoms", formData.symptoms.trim());
+      if (formData.driveLink.trim()) {
+        payload.driveLink = formData.driveLink.trim();
+      }
 
-      files.forEach((file) => {
-        formPayload.append("reports", file);
-      });
-
-      await submitPatient(formPayload).unwrap();
+      await submitPatient(payload).unwrap();
       SuccessToast("Patient case submitted successfully!");
       router.push("/sub-agent/patients");
     } catch (err: unknown) {
@@ -259,7 +205,7 @@ export default function SubAgentSubmitPatientPage() {
       formData.budgetRange.trim() &&
       formData.symptoms.trim().length >= 5
   );
-  const isReportsComplete = files.length > 0 && files.length <= 2;
+  const isDriveLinkProvided = Boolean(formData.driveLink.trim());
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -586,7 +532,7 @@ export default function SubAgentSubmitPatientPage() {
             </div>
           </Card>
 
-          {/* Section 3: Diagnostic Reports (PDF only, max 2) */}
+          {/* Section 3: Diagnostic Reports / Drive Link */}
           <Card className="p-6 md:p-7 bg-white rounded-3xl border border-teal-100 shadow-2xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
@@ -595,169 +541,43 @@ export default function SubAgentSubmitPatientPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-base">
-                    Medical Reports & Prescriptions
+                    Medical Reports & Documents (Google Drive Link)
                   </h3>
                   <p className="text-xs text-slate-400">
-                    PDF files only • Maximum 2 files • Required
+                    Provide a Google Drive or cloud storage link for medical documents
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-teal-50 text-teal-800 border border-teal-200">
-                {files.length} / 2 attached
-              </span>
             </div>
 
-            {/* Hidden Input */}
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,application/pdf"
-              multiple
-              disabled={files.length >= 2}
-              className="hidden"
-              onChange={handleFileChange}
-            />
-
-            {/* Clickable & Drag-Droppable Upload Box */}
-            <div
-              onClick={() => {
-                if (files.length < 2) {
-                  fileInputRef.current?.click();
-                }
-              }}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (files.length < 2) setIsDragging(true);
-              }}
-              onDragEnter={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                if (files.length < 2) setIsDragging(true);
-              }}
-              onDragLeave={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsDragging(false);
-              }}
-              onDrop={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setIsDragging(false);
-                if (files.length >= 2) {
-                  ErrorToast("Maximum 2 PDF reports already attached.");
-                  return;
-                }
-                if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-                  processFiles(Array.from(e.dataTransfer.files));
-                }
-              }}
-              className={`border-2 border-dashed rounded-3xl p-6 sm:p-8 text-center transition-all ${
-                isDragging
-                  ? "border-teal-600 bg-teal-50/70 scale-[1.01] shadow-md ring-4 ring-teal-500/10 cursor-copy"
-                  : errors.reports
-                  ? "border-rose-300 bg-rose-50/30 cursor-pointer"
-                  : files.length >= 2
-                  ? "border-slate-200 bg-slate-50/60 opacity-80 cursor-default"
-                  : "border-teal-200/90 bg-teal-50/20 hover:border-teal-500 hover:bg-teal-50/40 cursor-pointer"
-              }`}
-            >
-              <div className="w-12 h-12 rounded-2xl bg-teal-100/70 text-teal-700 flex items-center justify-center mx-auto mb-3 shadow-2xs">
-                <Upload className="w-6 h-6" />
-              </div>
-
-              <div className="space-y-1">
-                <div className="text-sm font-bold text-slate-800">
-                  {files.length >= 2 ? (
-                    <span className="text-slate-500">
-                      Maximum limit of 2 reports reached
-                    </span>
-                  ) : isDragging ? (
-                    <span className="text-teal-700 font-extrabold">
-                      Drop PDF files now to attach
-                    </span>
-                  ) : (
-                    <span>
-                      Click anywhere or drag & drop PDF files here
-                    </span>
-                  )}
-                </div>
-                <p className="text-xs text-slate-500">
-                  Prescriptions, laboratory test results, or doctor recommendations
-                </p>
-              </div>
-
-              {files.length < 2 && (
-                <div className="mt-4">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      fileInputRef.current?.click();
-                    }}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-white border border-teal-200 text-teal-800 font-bold text-xs hover:bg-teal-50 hover:border-teal-300 transition-all shadow-2xs cursor-pointer"
-                  >
-                    <Upload className="w-3.5 h-3.5" />
-                    <span>Select PDF File</span>
-                  </button>
-                </div>
-              )}
-
-              <p className="text-[11px] text-slate-400 mt-3">
-                Accepted: <strong>PDF format only</strong> (Up to 2 files, max 10MB each)
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
+                <span className="flex items-center gap-1.5">
+                  <LinkIcon className="w-3.5 h-3.5 text-teal-600" />
+                  <span>Google Drive Link</span>
+                </span>
+                {errors.driveLink && (
+                  <span className="text-rose-500 text-[11px] font-normal">
+                    {errors.driveLink}
+                  </span>
+                )}
+              </label>
+              <input
+                type="url"
+                name="driveLink"
+                value={formData.driveLink}
+                onChange={handleInputChange}
+                placeholder="https://drive.google.com/drive/folders/..."
+                className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
+                  errors.driveLink
+                    ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                    : "border-slate-200 focus:ring-teal-500/20 focus:border-teal-500"
+                }`}
+              />
+              <p className="text-[11px] text-slate-400 leading-relaxed">
+                Make sure the Drive link permissions are set to <strong>&quot;Anyone with the link can view&quot;</strong> so our medical review team can access the files.
               </p>
             </div>
-
-            {errors.reports && (
-              <p className="text-rose-500 text-xs flex items-center gap-1 font-medium">
-                <AlertCircle className="w-3.5 h-3.5" />
-                <span>{errors.reports}</span>
-              </p>
-            )}
-
-            {/* Uploaded File List */}
-            {files.length > 0 && (
-              <div className="space-y-2 pt-1">
-                <div className="text-xs font-bold text-slate-700">
-                  Attached Reports:
-                </div>
-                {files.map((file, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs"
-                  >
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <div className="w-8 h-8 rounded-lg bg-rose-50 text-rose-600 border border-rose-200 flex items-center justify-center shrink-0">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="font-semibold text-slate-800 truncate">
-                          {file.name}
-                        </div>
-                        <div className="text-[11px] text-slate-400">
-                          {(file.size / (1024 * 1024)).toFixed(2)} MB • PDF Document
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <FileCheck className="w-3 h-3" />
-                        <span>Ready</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeFile(idx)}
-                        className="p-1 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
-                        title="Remove file"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
           </Card>
 
           {/* Submit Action directly below Reports */}
@@ -845,11 +665,11 @@ export default function SubAgentSubmitPatientPage() {
               <div className="flex items-center gap-2">
                 <CheckCircle2
                   className={`w-4 h-4 ${
-                    isReportsComplete ? "text-emerald-500" : "text-slate-300"
+                    isDriveLinkProvided ? "text-emerald-500" : "text-slate-300"
                   }`}
                 />
-                <span className={isReportsComplete ? "text-slate-700 font-medium" : "text-slate-400"}>
-                  Diagnostic PDF reports (1-2 files)
+                <span className={isDriveLinkProvided ? "text-slate-700 font-medium" : "text-slate-400"}>
+                  Google Drive link (optional)
                 </span>
               </div>
             </div>

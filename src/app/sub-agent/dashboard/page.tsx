@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { User, Clock, Check, DollarSign, ArrowUpRight, Plus, Sparkles, Building2 } from "lucide-react";
+import { User, Clock, Check, ArrowUpRight, Plus, Sparkles, Building2 } from "lucide-react";
+import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import { useGetPatientsBySubAgentQuery } from "@/redux/features/agentPatient/agentPatientApi";
 
@@ -37,8 +38,8 @@ export default function SubAgentDashboard() {
     },
     {
       label: "My Referral Earnings",
-      value: "$4,280",
-      icon: DollarSign,
+      value: "TK 4,280",
+      icon: TkIcon,
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-700",
     },

@@ -12,15 +12,42 @@ import {
   Lock,
   AlertTriangle,
   AlertCircle,
+  Edit3,
+  X,
+  Link as LinkIcon,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import {
   useGetPatientsByAgentQuery,
   useUpdatePatientStatusMutation,
+  useUpdatePatientByAgentMutation,
   IAgentPatientItem,
 } from "@/redux/features/agentPatient/agentPatientApi";
 import { useGetMyNetworksQuery } from "@/redux/features/referralPartner/referralPartnerApi";
 import { SuccessToast, ErrorToast } from "@/helpers/ValidationHelper";
+
+const TREATMENT_CATEGORIES = [
+  "Cardiac Surgery & Cardiology",
+  "Orthopedic & Joint Replacement",
+  "Oncology & Cancer Care",
+  "Neurology & Neurosurgery",
+  "Organ Transplant (Liver / Kidney / Bone Marrow)",
+  "Gastroenterology & Hepatology",
+  "Ophthalmology & Eye Surgery",
+  "Dental Care & Implants",
+  "Executive Health Screening",
+  "Other Specialist Treatment",
+];
+
+const DESTINATION_COUNTRIES = [
+  "India",
+  "Thailand",
+  "Singapore",
+  "Malaysia",
+  "Turkey",
+  "United Arab Emirates",
+  "China",
+];
 
 export default function AgentPatientsPage() {
   const [activeTab, setActiveTab] = useState("all");
@@ -47,6 +74,133 @@ export default function AgentPatientsPage() {
 
   const [updatePatientStatus, { isLoading: isUpdatingStatus }] =
     useUpdatePatientStatusMutation();
+  const [updatePatient, { isLoading: isUpdatingPatient }] =
+    useUpdatePatientByAgentMutation();
+
+  const [editModalPatient, setEditModalPatient] = useState<IAgentPatientItem | null>(null);
+  const [editFormData, setEditFormData] = useState({
+    fullName: "",
+    phone: "",
+    age: "",
+    gender: "male",
+    treatmentType: "",
+    symptoms: "",
+    preferredCountry: "",
+    budgetRange: "",
+    driveLink: "",
+  });
+  const [editErrors, setEditErrors] = useState<Record<string, string>>({});
+
+  const handleOpenEdit = (patient: IAgentPatientItem) => {
+    setEditModalPatient(patient);
+    setEditFormData({
+      fullName: patient.fullName || "",
+      phone: patient.phone || "",
+      age: patient.age !== undefined && patient.age !== null ? String(patient.age) : "",
+      gender: (patient.gender || "male").toLowerCase(),
+      treatmentType: patient.treatmentType || TREATMENT_CATEGORIES[0],
+      symptoms: patient.symptoms || "",
+      preferredCountry: patient.preferredCountry || "India",
+      budgetRange: patient.budgetRange || "$5,000 - $10,000",
+      driveLink: patient.driveLink || "",
+    });
+    setEditErrors({});
+  };
+
+  const handleEditInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setEditFormData((prev) => ({ ...prev, [name]: value }));
+    if (editErrors[name]) {
+      setEditErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
+    }
+  };
+
+  const handleSaveEdit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editModalPatient) return;
+
+    const newErrors: Record<string, string> = {};
+    if (!editFormData.fullName.trim()) {
+      newErrors.fullName = "Patient full name is required";
+    }
+    const cleanPhone = editFormData.phone.replace(/[\s\-()]/g, "");
+    if (!cleanPhone) {
+      newErrors.phone = "Phone number is required";
+    } else if (!/^\+?\d{6,14}$/.test(cleanPhone)) {
+      newErrors.phone = "Enter a valid phone number";
+    }
+    const ageNum = Number(editFormData.age);
+    if (!editFormData.age || isNaN(ageNum)) {
+      newErrors.age = "Valid age is required";
+    } else if (ageNum < 1 || ageNum > 120) {
+      newErrors.age = "Age must be between 1 and 120";
+    }
+    if (!editFormData.treatmentType.trim()) {
+      newErrors.treatmentType = "Treatment category is required";
+    }
+    if (!editFormData.symptoms.trim()) {
+      newErrors.symptoms = "Symptoms & details are required";
+    }
+    if (editFormData.driveLink.trim()) {
+      try {
+        new URL(editFormData.driveLink.trim());
+      } catch {
+        newErrors.driveLink = "Enter a valid URL (e.g. https://drive.google.com/...)";
+      }
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setEditErrors(newErrors);
+      ErrorToast("Please fix validation errors.");
+      return;
+    }
+
+    try {
+      const payload: {
+        fullName: string;
+        phone: string;
+        age: number;
+        gender: string;
+        treatmentType: string;
+        symptoms: string;
+        preferredCountry: string;
+        budgetRange: string;
+        driveLink?: string;
+      } = {
+        fullName: editFormData.fullName.trim(),
+        phone: cleanPhone,
+        age: Math.floor(Number(editFormData.age)),
+        gender: editFormData.gender.toLowerCase(),
+        treatmentType: editFormData.treatmentType.trim(),
+        symptoms: editFormData.symptoms.trim(),
+        preferredCountry: editFormData.preferredCountry.trim(),
+        budgetRange: editFormData.budgetRange.trim(),
+      };
+
+      if (editFormData.driveLink.trim()) {
+        payload.driveLink = editFormData.driveLink.trim();
+      }
+
+      await updatePatient({
+        patientId: editModalPatient._id,
+        data: payload,
+      }).unwrap();
+
+      SuccessToast("Patient case updated successfully!");
+      setEditModalPatient(null);
+    } catch (err: unknown) {
+      const errorMsg =
+        (err as { data?: { message?: string } })?.data?.message ||
+        "Failed to update patient. Please try again.";
+      ErrorToast(errorMsg);
+    }
+  };
 
   const samplePatients: IAgentPatientItem[] = [
     {
@@ -450,9 +604,10 @@ export default function AgentPatientsPage() {
                   patientsList.map((p) => {
                     const id = p.caseId || p._id;
                     const isSelected = selectedCaseId === id;
+                    const isDirect = !p.subAgentId && !p.subAgent;
                     const submitter = p.subAgent?.fullName
                       ? `${p.subAgent.fullName} (${p.subAgent.refCode || "Partner"})`
-                      : "Direct Master Agent";
+                      : "You";
 
                     return (
                       <tr
@@ -487,7 +642,7 @@ export default function AgentPatientsPage() {
                             {submitter}
                           </div>
                           <div className="text-[10px] text-slate-400">
-                            {p.subAgent?.agencyName || "Direct onboarding"}
+                            {p.subAgent?.agencyName}
                           </div>
                         </td>
 
@@ -525,23 +680,37 @@ export default function AgentPatientsPage() {
                   <span className="text-xs font-medium text-slate-500">
                     Case {selectedPatient.caseId || "CS-" + selectedPatient._id.slice(-4)}
                   </span>
-                  <span
-                    className={`text-xs font-semibold px-3 py-0.5 rounded-full capitalize ${
-                      selectedPatient.status === "ongoing"
-                        ? "bg-[#e0f2fe] text-[#0284c7]"
-                        : selectedPatient.status === "completed"
-                        ? "bg-slate-100 text-slate-700"
-                        : selectedPatient.status === "under_review"
-                        ? "bg-[#ffedd5] text-[#d97706]"
-                        : selectedPatient.status === "confirmed"
-                        ? "bg-[#d1fae5] text-[#059669]"
-                        : selectedPatient.status === "cancelled"
-                        ? "bg-rose-50 text-rose-700"
-                        : "bg-purple-50 text-purple-700"
-                    }`}
-                  >
-                    {selectedPatient.status.replace("_", " ")}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    {/* Allow Edit button only for direct cases (no subAgent) and not finalized */}
+                    {!selectedPatient.subAgentId && !selectedPatient.subAgent && !isFinalized && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(selectedPatient)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors cursor-pointer shadow-2xs"
+                        title="Edit patient details"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                    <span
+                      className={`text-xs font-semibold px-3 py-0.5 rounded-full capitalize ${
+                        selectedPatient.status === "ongoing"
+                          ? "bg-[#e0f2fe] text-[#0284c7]"
+                          : selectedPatient.status === "completed"
+                          ? "bg-slate-100 text-slate-700"
+                          : selectedPatient.status === "under_review"
+                          ? "bg-[#ffedd5] text-[#d97706]"
+                          : selectedPatient.status === "confirmed"
+                          ? "bg-[#d1fae5] text-[#059669]"
+                          : selectedPatient.status === "cancelled"
+                          ? "bg-rose-50 text-rose-700"
+                          : "bg-purple-50 text-purple-700"
+                      }`}
+                    >
+                      {selectedPatient.status.replace("_", " ")}
+                    </span>
+                  </div>
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900 mt-1">
                   {selectedPatient.fullName}
@@ -561,13 +730,13 @@ export default function AgentPatientsPage() {
                   <span className="font-bold text-slate-900">
                     {selectedPatient.subAgent?.fullName
                       ? `${selectedPatient.subAgent.fullName} (${selectedPatient.subAgent.refCode || "RP-0112"})`
-                      : "Direct Master Agent"}
+                      : "You"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Channel Partner</span>
                   <span className="font-bold text-slate-900">
-                    {selectedPatient.subAgent?.agencyName || "Channel Partner A"}
+                    {selectedPatient.subAgent?.agencyName || "You"}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -796,6 +965,268 @@ export default function AgentPatientsPage() {
                 )}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Patient Pop-up Modal (Only for direct patients without sub-agent) */}
+      {editModalPatient && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[85vh] overflow-hidden">
+            {/* Modal Header (Fixed at top) */}
+            <div className="flex items-center justify-between p-6 pb-4 border-b border-slate-100 shrink-0 bg-white">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">
+                  <Edit3 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-slate-900">
+                    Edit Patient Details
+                  </h3>
+                  <p className="text-xs text-slate-400">
+                    Case {editModalPatient.caseId || "CS-" + editModalPatient._id.slice(-4)} &bull; Direct Agency Patient
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setEditModalPatient(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                title="Close modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleSaveEdit} className="flex flex-col flex-1 min-h-0 overflow-hidden">
+              {/* Scrollable Form Body */}
+              <div className="p-6 overflow-y-auto space-y-4 flex-1">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Full Name */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Full Name <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={editFormData.fullName}
+                      onChange={handleEditInputChange}
+                      placeholder="Enter patient full name"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
+                        editErrors.fullName
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                          : "border-slate-200 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
+                    />
+                    {editErrors.fullName && (
+                      <p className="text-rose-500 text-[11px]">{editErrors.fullName}</p>
+                    )}
+                  </div>
+
+                  {/* Phone */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Phone Number <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="phone"
+                      value={editFormData.phone}
+                      onChange={handleEditInputChange}
+                      placeholder="01700000000"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
+                        editErrors.phone
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                          : "border-slate-200 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
+                    />
+                    {editErrors.phone && (
+                      <p className="text-rose-500 text-[11px]">{editErrors.phone}</p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Age */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Age <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      name="age"
+                      min={1}
+                      max={120}
+                      value={editFormData.age}
+                      onChange={handleEditInputChange}
+                      placeholder="e.g. 45"
+                      className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
+                        editErrors.age
+                          ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                          : "border-slate-200 focus:ring-blue-500/20 focus:border-blue-500"
+                      }`}
+                    />
+                    {editErrors.age && (
+                      <p className="text-rose-500 text-[11px]">{editErrors.age}</p>
+                    )}
+                  </div>
+
+                  {/* Gender */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Gender <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {(["male", "female", "other"] as const).map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          onClick={() =>
+                            setEditFormData((prev) => ({ ...prev, gender: g }))
+                          }
+                          className={`py-2 px-3 rounded-xl text-xs font-semibold border capitalize transition-all cursor-pointer text-center ${
+                            editFormData.gender === g
+                              ? "bg-blue-50 border-blue-600 text-blue-700 font-bold ring-1 ring-blue-600/30"
+                              : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                          }`}
+                        >
+                          {g}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {/* Treatment Type */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Treatment Category <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      name="treatmentType"
+                      value={editFormData.treatmentType}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                    >
+                      {TREATMENT_CATEGORIES.map((cat) => (
+                        <option key={cat} value={cat}>
+                          {cat}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Preferred Country */}
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-bold text-slate-700">
+                      Preferred Country <span className="text-rose-500">*</span>
+                    </label>
+                    <select
+                      name="preferredCountry"
+                      value={editFormData.preferredCountry}
+                      onChange={handleEditInputChange}
+                      className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
+                    >
+                      {DESTINATION_COUNTRIES.map((c) => (
+                        <option key={c} value={c}>
+                          {c}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                {/* Budget Range */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">
+                    Budget Range <span className="text-rose-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    name="budgetRange"
+                    value={editFormData.budgetRange}
+                    onChange={handleEditInputChange}
+                    placeholder="e.g. 5-10 thousands BDT or $5,000 - $10,000"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  />
+                </div>
+
+                {/* Symptoms */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700">
+                    Symptoms & Clinical Notes <span className="text-rose-500">*</span>
+                  </label>
+                  <textarea
+                    name="symptoms"
+                    rows={3}
+                    value={editFormData.symptoms}
+                    onChange={handleEditInputChange}
+                    placeholder="Describe patient's symptoms, diagnosis, and doctor notes..."
+                    className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 leading-relaxed ${
+                      editErrors.symptoms
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                        : "border-slate-200 focus:ring-blue-500/20 focus:border-blue-500"
+                    }`}
+                  />
+                  {editErrors.symptoms && (
+                    <p className="text-rose-500 text-[11px]">{editErrors.symptoms}</p>
+                  )}
+                </div>
+
+                {/* Drive Link */}
+                <div className="space-y-1.5">
+                  <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <LinkIcon className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Google Drive Link (Optional)</span>
+                  </label>
+                  <input
+                    type="url"
+                    name="driveLink"
+                    value={editFormData.driveLink}
+                    onChange={handleEditInputChange}
+                    placeholder="https://drive.google.com/..."
+                    className={`w-full px-3.5 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
+                      editErrors.driveLink
+                        ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
+                        : "border-slate-200 focus:ring-blue-500/20 focus:border-blue-500"
+                    }`}
+                  />
+                  {editErrors.driveLink && (
+                    <p className="text-rose-500 text-[11px]">{editErrors.driveLink}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons (Fixed Footer) */}
+              <div className="flex items-center justify-end gap-3 p-5 border-t border-slate-100 bg-slate-50/70 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setEditModalPatient(null)}
+                  disabled={isUpdatingPatient}
+                  className="px-5 py-2.5 rounded-xl text-xs font-semibold text-slate-700 bg-white border border-slate-200 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdatingPatient}
+                  style={{ background: "linear-gradient(135deg, #0062c4, #1d4ed8)" }}
+                  className="px-6 py-2.5 rounded-xl text-xs font-bold text-white transition-all shadow-md hover:opacity-95 flex items-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  {isUpdatingPatient ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      <span>Saving Changes...</span>
+                    </>
+                  ) : (
+                    <span>Save Patient Changes</span>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

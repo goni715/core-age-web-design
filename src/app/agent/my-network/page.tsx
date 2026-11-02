@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { Search, ChevronRight, Check, Loader2, Users, Clock, DollarSign, Share2 } from "lucide-react";
+import { Search, ChevronRight, Check, Loader2, Users, Clock, Share2 } from "lucide-react";
+import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import {
   useGenerateInvitationLinkMutation,
@@ -85,7 +86,7 @@ export default function AgentMyNetworkPage() {
       cases: 64,
       ongoing: 7,
       done: 57,
-      earnings: "$1,980",
+      earnings: "TK 1,980",
       status: "active",
       email: "nusrat@example.com",
     },
@@ -99,7 +100,7 @@ export default function AgentMyNetworkPage() {
       cases: 51,
       ongoing: 5,
       done: 46,
-      earnings: "$1,620",
+      earnings: "TK 1,620",
       status: "active",
       email: "imran@example.com",
     },
@@ -113,7 +114,7 @@ export default function AgentMyNetworkPage() {
       cases: 43,
       ongoing: 6,
       done: 37,
-      earnings: "$1,310",
+      earnings: "TK 1,310",
       status: "active",
       email: "farhana@example.com",
     },
@@ -127,7 +128,7 @@ export default function AgentMyNetworkPage() {
       cases: 29,
       ongoing: 3,
       done: 26,
-      earnings: "$890",
+      earnings: "TK 890",
       status: "active",
       email: "rakib@example.com",
     },
@@ -141,7 +142,7 @@ export default function AgentMyNetworkPage() {
       cases: 22,
       ongoing: 4,
       done: 18,
-      earnings: "$640",
+      earnings: "TK 640",
       status: "active",
       email: "hasan@example.com",
     },
@@ -167,10 +168,10 @@ export default function AgentMyNetworkPage() {
   const casesInNetworkCount = overviewStats?.casesInNetwork ?? 0;
 
   const networkEarnings =
-    overviewStats?.formattedEarnings ??
+    overviewStats?.formattedEarnings?.replace("$", "TK ") ??
     (overviewStats?.networkEarnings !== undefined
-      ? `$${overviewStats.networkEarnings.toLocaleString()}`
-      : "$0");
+      ? `TK ${overviewStats.networkEarnings.toLocaleString()}`
+      : "TK 0");
 
   const allCount =
     statusCounts?.all ?? networkData?.meta?.total ?? partners.length;
@@ -254,7 +255,7 @@ export default function AgentMyNetworkPage() {
               Network Earnings
             </span>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
-              <DollarSign className="w-4 h-4" />
+              <TkIcon className="w-4 h-4" />
             </div>
           </div>
           <div className="text-3xl font-extrabold text-slate-900 tracking-tight mt-2">
@@ -369,7 +370,7 @@ export default function AgentMyNetworkPage() {
                   const casesCount = partner.cases ?? (Number(partner.ongoing || 0) + Number(partner.done || 0));
                   const ongoingCount = partner.ongoing ?? 0;
                   const doneCount = partner.done ?? 0;
-                  const earnings = partner.earnings ?? "$0";
+                  const earnings = typeof partner.earnings === "string" ? partner.earnings.replace("$", "TK ") : (partner.earnings !== undefined ? `TK ${partner.earnings}` : "TK 0");
                   const status = (partner.status || "active").toLowerCase();
 
                   return (

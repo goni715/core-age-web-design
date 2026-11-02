@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { User, Clock, Check, DollarSign, ArrowUpRight, Share2, Plus } from "lucide-react";
+import { User, Clock, Check, ArrowUpRight, Share2, Plus } from "lucide-react";
+import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import {
   useGetMyNetworksQuery,
@@ -24,10 +25,10 @@ export default function AgentDashboard() {
   const ongoingCases = patientsData?.statusCounts?.ongoing || 0;
   const completedCases = patientsData?.statusCounts?.completed || 0;
   const networkEarnings =
-    statsData?.data?.overviewStats?.formattedEarnings ??
+    statsData?.data?.overviewStats?.formattedEarnings?.replace("$", "TK ") ??
     (statsData?.data?.overviewStats?.networkEarnings !== undefined
-      ? `$${statsData.data.overviewStats.networkEarnings.toLocaleString()}`
-      : "$0");
+      ? `TK ${statsData.data.overviewStats.networkEarnings.toLocaleString()}`
+      : "TK 0");
 
   const stats = [
     {
@@ -61,7 +62,7 @@ export default function AgentDashboard() {
     {
       label: "Network Earnings",
       value: networkEarnings,
-      icon: DollarSign,
+      icon: TkIcon,
       iconBg: "bg-[#f0fdf4]",
       iconColor: "text-[#16a34a]",
     },

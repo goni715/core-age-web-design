@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { User, Phone, Mail, Building2, Sparkles, DollarSign, Award } from "lucide-react";
+import { User, Phone, Mail, Building2, Sparkles, Award } from "lucide-react";
+import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import { getUserInfo } from "@/helpers/SessionHelper";
 
@@ -108,7 +109,7 @@ export default function SubAgentProfilePage() {
 
           <Card className="p-6 bg-white rounded-3xl border border-teal-100 shadow-2xs space-y-3">
             <h3 className="font-bold text-slate-900 text-sm flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-emerald-600" />
+              <TkIcon className="w-4 h-4 text-emerald-600" />
               <span>Payment Details</span>
             </h3>
             <p className="text-xs text-slate-500">

@@ -45,6 +45,7 @@ export interface IAgentPatientItem {
   preferredCountry?: string;
   budgetRange?: string;
   reports?: string[];
+  driveLink?: string;
   status: "submitted" | "under_review" | "confirmed" | "ongoing" | "completed" | "cancelled" | string;
   timeline?: {
     submittedAt?: string | null;
@@ -85,6 +86,74 @@ export interface IAgentPatientsResponse {
   data: IAgentPatientItem[];
 }
 
+export interface IMonthlyEarning {
+  month: string;
+  earnings: number;
+  commission: number;
+}
+
+export interface ICommissionStatsData {
+  totalCommission: number;
+  pendingCommission: number;
+  paidCommission: number;
+  pending: number;
+  paid: number;
+  monthlyEarnings: IMonthlyEarning[];
+}
+
+export interface ICommissionStatsQueryParams {
+  year?: number | string;
+}
+
+export interface ICommissionStatsResponse {
+  success: boolean;
+  message: string;
+  data: ICommissionStatsData;
+}
+
+export interface IAgentCommissionItem {
+  _id: string;
+  caseId: string;
+  fullName?: string;
+  patientName?: string;
+  agentCommissionFee?: number;
+  commission?: number;
+  commissionFee?: number;
+  paymentStatus?: "pending" | "paid" | "unpaid" | string;
+  status?: string;
+  patientStatus?: string;
+  hospital?: string;
+  date?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface IAgentCommissionsQueryParams {
+  searchTerm?: string;
+  paymentStatus?: string;
+  status?: string;
+  page?: number | string;
+  limit?: number | string;
+}
+
+export interface IAgentCommissionsResponse {
+  success: boolean;
+  message: string;
+  meta?: {
+    page: number;
+    limit: number;
+    totalPages: number;
+    total: number;
+  };
+  statusCounts?: {
+    all: number;
+    pending: number;
+    paid: number;
+    unpaid: number;
+  };
+  data: IAgentCommissionItem[];
+}
+
 export interface ISubmitPatientPayload {
   fullName: string;
   phone: string;
@@ -95,6 +164,7 @@ export interface ISubmitPatientPayload {
   preferredCountry?: string;
   budgetRange?: string;
   subAgentId?: string;
+  driveLink?: string;
   reports?: File[] | string[];
 }
 
@@ -183,6 +253,132 @@ export const agentPatientApi = apiSlice.injectEndpoints({
       }),
       invalidatesTags: [TagTypes.PATIENT_CASES, TagTypes.MY_NETWORKS],
     }),
+
+    updatePatientByAgent: builder.mutation<
+      { success: boolean; message: string; data?: unknown },
+      {
+        patientId: string;
+        data: Partial<ISubmitPatientPayload>;
+      }
+    >({
+      query: ({ patientId, data }) => ({
+        url: `/agent-patient/update-patient/by-agent/${patientId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [TagTypes.PATIENT_CASES, TagTypes.MY_NETWORKS],
+    }),
+
+    updatePatientBySubAgent: builder.mutation<
+      { success: boolean; message: string; data?: unknown },
+      {
+        patientId: string;
+        data: Partial<ISubmitPatientPayload>;
+      }
+    >({
+      query: ({ patientId, data }) => ({
+        url: `/agent-patient/update-patient/by-agent/${patientId}`,
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [TagTypes.PATIENT_CASES],
+    }),
+
+    getCommissionStatsByAgent: builder.query<
+      ICommissionStatsResponse,
+      ICommissionStatsQueryParams | number | string | void
+    >({
+      query: (args) => {
+        let yearParam: number | string | undefined;
+        if (typeof args === "number" || typeof args === "string") {
+          yearParam = args;
+        } else if (args && typeof args === "object") {
+          yearParam = args.year;
+        }
+
+        const params = new URLSearchParams();
+        if (yearParam !== undefined && yearParam !== null && yearParam !== "") {
+          params.append("year", String(yearParam));
+        }
+
+        return {
+          url: "/agent-patient/commission-stats/by-agent",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: [TagTypes.PATIENT_CASES, TagTypes.MY_NETWORKS],
+    }),
+
+    getAllCommissionsByAgent: builder.query<
+      IAgentCommissionsResponse,
+      IAgentCommissionsQueryParams | void
+    >({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args && typeof args === "object") {
+          Object.entries(args).forEach(([key, val]) => {
+            if (val !== undefined && val !== null && val !== "" && val !== "all" && val !== "All") {
+              params.append(key, String(val));
+            }
+          });
+        }
+        return {
+          url: "/agent-patient/all-commissions/by-agent",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: [TagTypes.PATIENT_CASES, TagTypes.MY_NETWORKS],
+    }),
+
+    getCommissionStatsBySubAgent: builder.query<
+      ICommissionStatsResponse,
+      ICommissionStatsQueryParams | number | string | void
+    >({
+      query: (args) => {
+        let yearParam: number | string | undefined;
+        if (typeof args === "number" || typeof args === "string") {
+          yearParam = args;
+        } else if (args && typeof args === "object") {
+          yearParam = args.year;
+        }
+
+        const params = new URLSearchParams();
+        if (yearParam !== undefined && yearParam !== null && yearParam !== "") {
+          params.append("year", String(yearParam));
+        }
+
+        return {
+          url: "/agent-patient/commission-stats/by-sub-agent",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: [TagTypes.PATIENT_CASES],
+    }),
+
+    getAllCommissionsBySubAgent: builder.query<
+      IAgentCommissionsResponse,
+      IAgentCommissionsQueryParams | void
+    >({
+      query: (args) => {
+        const params = new URLSearchParams();
+        if (args && typeof args === "object") {
+          Object.entries(args).forEach(([key, val]) => {
+            if (val !== undefined && val !== null && val !== "" && val !== "all" && val !== "All") {
+              params.append(key, String(val));
+            }
+          });
+        }
+        return {
+          url: "/agent-patient/all-commissions/by-sub-agent",
+          method: "GET",
+          params,
+        };
+      },
+      providesTags: [TagTypes.PATIENT_CASES],
+    }),
   }),
 });
 
@@ -194,4 +390,10 @@ export const {
   useSubmitPatientBySubAgentMutation,
   useGetPatientByIdQuery,
   useUpdatePatientStatusMutation,
+  useUpdatePatientByAgentMutation,
+  useUpdatePatientBySubAgentMutation,
+  useGetCommissionStatsByAgentQuery,
+  useGetAllCommissionsByAgentQuery,
+  useGetCommissionStatsBySubAgentQuery,
+  useGetAllCommissionsBySubAgentQuery,
 } = agentPatientApi;
