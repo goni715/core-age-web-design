@@ -7,9 +7,6 @@ import {
   subAgentRegisterSchema,
   type TSubAgentRegisterValues,
 } from "@/schemas/auth.schema";
-import CustomIconInput from "@/components/common/CustomIconInput";
-import CustomCheckbox from "@/components/common/CustomCheckbox";
-import SubmitButton from "@/components/common/SubmitButton";
 import Link from "next/link";
 import {
   User,
@@ -20,8 +17,8 @@ import {
   Sparkles,
   ArrowRight,
   CheckCircle2,
-  Users,
   RotateCcw,
+  UserPlus,
 } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
 import { useRegisterReferralPartnerMutation } from "@/redux/features/referralPartner/referralPartnerApi";
@@ -58,29 +55,31 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
     useState<TSubAgentRegisterValues | null>(null);
   const [countdown, setCountdown] = useState<number>(5);
 
-  const { handleSubmit, control, setValue } =
-    useForm<TSubAgentRegisterValues>({
-      resolver: zodResolver(subAgentRegisterSchema),
-      defaultValues: {
-        fullName: "",
-        agencyName: "",
-        email: "",
-        phone: "",
-        referralToken: tokenFromUrl,
-        password: "",
-        confirmPassword: "",
-        termsAccepted: true,
-      },
-    });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    formState: { errors },
+  } = useForm<TSubAgentRegisterValues>({
+    resolver: zodResolver(subAgentRegisterSchema),
+    defaultValues: {
+      fullName: "",
+      agencyName: "",
+      email: "",
+      phone: "",
+      referralToken: tokenFromUrl,
+      password: "",
+      confirmPassword: "",
+      termsAccepted: true,
+    },
+  });
 
-  // Keep referralToken synced in form state from URL param
   React.useEffect(() => {
     if (tokenFromUrl) {
       setValue("referralToken", tokenFromUrl);
     }
   }, [tokenFromUrl, setValue]);
 
-  // Auto-redirect to login after 5 seconds on successful registration (No OTP required)
   React.useEffect(() => {
     if (!submittedData) return;
     if (countdown <= 0) {
@@ -104,7 +103,8 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
     ).trim();
 
     if (!token) {
-      const msg = "Referral token is missing from the invitation URL. Please use a valid referral link.";
+      const msg =
+        "Referral token is missing from the invitation URL. Please use a valid referral invitation link.";
       setSubmitError(msg);
       ErrorToast(msg);
       return;
@@ -123,7 +123,8 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
       }).unwrap();
 
       SuccessToast(
-        res?.message || "Sub-Agent registered successfully! You can now login directly."
+        res?.message ||
+          "Referral Partner registered successfully! You can now login directly."
       );
 
       setCountdown(5);
@@ -146,7 +147,6 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
     }
   };
 
-  // Success view once registered (No OTP verification required)
   if (submittedData) {
     return (
       <div className="space-y-6 text-center py-2 animate-in fade-in-50 zoom-in-95 duration-300">
@@ -160,10 +160,10 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
             Registration Successful
           </div>
           <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Welcome to the Network!
+            Welcome to 3S Network!
           </h2>
           <p className="text-slate-500 text-sm max-w-sm mx-auto">
-            Your Sub-Agent account has been created. You can now login directly
+            Your Referral Partner account has been activated. You can now login directly
             to access your referral dashboard.
           </p>
         </div>
@@ -172,32 +172,24 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
         <div className="bg-slate-50/80 rounded-2xl p-4.5 border border-slate-200/70 text-left text-xs space-y-2.5">
           <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
             <span className="text-slate-500">Applicant:</span>
-            <span className="font-bold text-slate-800">
-              {submittedData.fullName}
-            </span>
+            <span className="font-bold text-slate-800">{submittedData.fullName}</span>
           </div>
           <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
-            <span className="text-slate-500">Sub-Agency / Clinic:</span>
-            <span className="font-semibold text-slate-800">
-              {submittedData.agencyName}
-            </span>
+            <span className="text-slate-500">Agency / Clinic:</span>
+            <span className="font-semibold text-slate-800">{submittedData.agencyName}</span>
           </div>
           <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
             <span className="text-slate-500">Email:</span>
-            <span className="font-medium text-slate-700">
-              {submittedData.email}
-            </span>
+            <span className="font-medium text-slate-700">{submittedData.email}</span>
           </div>
           <div className="flex justify-between items-center pb-2 border-b border-slate-200/60">
             <span className="text-slate-500">Phone:</span>
-            <span className="font-medium text-slate-700">
-              {submittedData.phone}
-            </span>
+            <span className="font-medium text-slate-700">{submittedData.phone}</span>
           </div>
           <div className="flex justify-between items-center pt-0.5">
             <span className="text-slate-500">Status:</span>
             <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-              Active Partner
+              Active Referral Partner
             </span>
           </div>
         </div>
@@ -226,162 +218,170 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
 
   return (
     <div className="space-y-5">
-      {/* Form Header */}
-      <div>
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-blue-700 text-xs font-semibold mb-2.5">
-          <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse" />
-          <Users className="w-3.5 h-3.5" />
-          <span>Authorized Sub-Agent Registration</span>
-        </div>
-        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">
-          Sub-Agent Sign Up
+      {/* Header */}
+      <div className="space-y-1.5">
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-800 text-[11px] font-semibold">
+          <UserPlus className="w-3.5 h-3.5" />
+          <span>Referral Partner Invitation</span>
+        </span>
+        <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+          Register as Referral Partner
         </h2>
-        <p className="text-slate-500 text-sm mt-1">
-          Complete your information to join your Channel Partner&apos;s referral
-          network.
+        <p className="text-slate-500 text-xs sm:text-sm leading-relaxed">
+          You have been invited to join 3S Medi Care international healthcare network. Complete your profile to start referring patients.
         </p>
       </div>
 
-      {/* Error Alert */}
       {submitError && (
-        <ErrorAlert
-          message={submitError}
-          onClose={() => setSubmitError("")}
-        />
+        <ErrorAlert message={submitError} onClose={() => setSubmitError("")} />
       )}
 
-      {/* Main Form */}
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
         {/* Full Name */}
-        <CustomIconInput
-          label="Full Name"
-          name="fullName"
-          control={control}
-          placeholder="Enter full name"
-          icon={User}
-          disabled={isRegistering}
-          required
-        />
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-700 block">
+            Full Name
+          </label>
+          <div className="relative">
+            <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="e.g. Manik Islam"
+              {...register("fullName")}
+              disabled={isRegistering}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+            />
+          </div>
+          {errors.fullName && (
+            <p className="text-rose-500 text-[11px]">{errors.fullName.message}</p>
+          )}
+        </div>
 
-        {/* Agency / Clinic / Practice Name */}
-        <CustomIconInput
-          label="Sub-Agency / Clinic Name"
-          name="agencyName"
-          control={control}
-          placeholder="e.g. Dhaka Health Consultancy"
-          icon={Briefcase}
-          disabled={isRegistering}
-          required
-        />
+        {/* Agency / Clinic */}
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-700 block">
+            Clinic / Agency / Business Name
+          </label>
+          <div className="relative">
+            <Briefcase className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="e.g. Care Point Clinic"
+              {...register("agencyName")}
+              disabled={isRegistering}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+            />
+          </div>
+          {errors.agencyName && (
+            <p className="text-rose-500 text-[11px]">{errors.agencyName.message}</p>
+          )}
+        </div>
 
-        {/* Email Address */}
-        <CustomIconInput
-          label="Email Address"
-          name="email"
-          type="email"
-          control={control}
-          placeholder="e.g. subagent@example.com"
-          icon={Mail}
-          disabled={isRegistering}
-          autoComplete="email"
-          required
-        />
+        {/* Email */}
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-700 block">
+            Email address
+          </label>
+          <div className="relative">
+            <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="email"
+              placeholder="you@example.com"
+              {...register("email")}
+              disabled={isRegistering}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+            />
+          </div>
+          {errors.email && (
+            <p className="text-rose-500 text-[11px]">{errors.email.message}</p>
+          )}
+        </div>
 
-        {/* Phone Number */}
-        <CustomIconInput
-          label="Phone Number"
-          name="phone"
-          type="tel"
-          control={control}
-          placeholder="e.g. 01712345678 or +8801712345678"
-          icon={Phone}
-          disabled={isRegistering}
-          autoComplete="tel"
-          required
-        />
+        {/* Phone */}
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-700 block">
+            Phone Number
+          </label>
+          <div className="relative">
+            <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="tel"
+              placeholder="01700000000"
+              {...register("phone")}
+              disabled={isRegistering}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+            />
+          </div>
+          {errors.phone && (
+            <p className="text-rose-500 text-[11px]">{errors.phone.message}</p>
+          )}
+        </div>
 
         {/* Password */}
-        <CustomIconInput
-          label="Password"
-          name="password"
-          type="password"
-          control={control}
-          placeholder="••••••••"
-          icon={Lock}
-          disabled={isRegistering}
-          autoComplete="new-password"
-          required
-        />
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-700 block">
+            Password
+          </label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="password"
+              placeholder="••••••••"
+              {...register("password")}
+              disabled={isRegistering}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+            />
+          </div>
+          {errors.password && (
+            <p className="text-rose-500 text-[11px]">{errors.password.message}</p>
+          )}
+        </div>
 
         {/* Confirm Password */}
-        <CustomIconInput
-          label="Confirm Password"
-          name="confirmPassword"
-          type="password"
-          control={control}
-          placeholder="••••••••"
-          icon={Lock}
-          disabled={isRegistering}
-          autoComplete="new-password"
-          required
-        />
+        <div className="space-y-1">
+          <label className="text-xs font-semibold text-slate-700 block">
+            Confirm Password
+          </label>
+          <div className="relative">
+            <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="password"
+              placeholder="••••••••"
+              {...register("confirmPassword")}
+              disabled={isRegistering}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 bg-white"
+            />
+          </div>
+          {errors.confirmPassword && (
+            <p className="text-rose-500 text-[11px]">
+              {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
 
-        {/* Terms Checkbox */}
-        <CustomCheckbox
-          name="termsAccepted"
-          control={control}
+        {/* Submit */}
+        <button
+          type="submit"
           disabled={isRegistering}
-          label={
-            <span className="text-xs text-slate-500 leading-relaxed">
-              I agree to 3S Medicare&apos;s{" "}
-              <Link
-                href="#"
-                className="text-blue-600 font-semibold hover:underline"
-              >
-                Terms of Service
-              </Link>
-              ,{" "}
-              <Link
-                href="#"
-                className="text-blue-600 font-semibold hover:underline"
-              >
-                Privacy Policy
-              </Link>
-              , and the{" "}
-              <span className="text-slate-700 font-semibold">
-                Sub-Agent Partner Agreement
-              </span>
-              .
-            </span>
-          }
-        />
-
-        {/* Submit Button */}
-        <SubmitButton
-          isLoading={isRegistering}
-          loadingTitle="Creating Sub-Agent account..."
-          style={{
-            background: "linear-gradient(135deg, #005ca9 0%, #0d9488 100%)",
-            color: "#ffffff",
-            boxShadow: "0 4px 14px 0 rgba(0, 92, 169, 0.35)",
-          }}
-          className="h-11 text-sm font-semibold !text-white shadow-md hover:shadow-lg transition-all rounded-xl mt-2 cursor-pointer hover:opacity-95"
+          className="w-full py-2.5 px-4 bg-[#0d9488] hover:bg-[#0f766e] text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 pt-2"
         >
-          <span className="font-semibold text-white">Complete Sub-Agent Registration</span>
-          <ArrowRight className="w-4 h-4 ml-1 text-white" />
-        </SubmitButton>
+          <span>
+            {isRegistering ? "Creating account..." : "Register as Referral Partner"}
+          </span>
+          {!isRegistering && <ArrowRight className="w-4 h-4" />}
+        </button>
       </form>
 
-      {/* Footer Sign-in Link */}
-      <p className="text-center text-sm text-slate-500 font-medium pt-1">
-        Already registered?{" "}
+      {/* Switch to Login */}
+      <div className="pt-2 text-center text-xs text-slate-500">
+        Already have an account?{" "}
         <Link
-          href="/login"
-          className="text-blue-600 font-bold hover:underline"
+          href="/login?role=sub-agent"
+          className="text-teal-700 font-bold hover:underline"
         >
           Sign In
         </Link>
-      </p>
+      </div>
     </div>
   );
 };
