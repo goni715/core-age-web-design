@@ -13,6 +13,7 @@ const TagTypes = {
     REFERRAL_PARTNER: "ReferralPartner",
     PATIENT_CASES: "PatientCases",
     MY_NETWORKS: "MyNetworks",
+    HOSPITALS: "Hospitals",
 } as const;
 
 export default TagTypes;

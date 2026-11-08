@@ -54,6 +54,19 @@ export interface IGetHospitalsResponse {
   data: IHospital[];
 }
 
+export interface IHospitalCountryStat {
+  country: string;
+  code: string;
+  totalHospitals: number;
+  count: number;
+}
+
+export interface IHospitalCountryStatsResponse {
+  success: boolean;
+  message: string;
+  data: IHospitalCountryStat[];
+}
+
 export interface IHospitalQueryParams {
   searchTerm?: string;
   status?: string;

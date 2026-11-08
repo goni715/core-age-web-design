@@ -28,3 +28,17 @@ export interface ISupportResponse {
   };
   data: ISupport[];
 }
+
+export interface ISubmitSupportPayload {
+  fullName: string;
+  email: string;
+  phone: string;
+  subject: string;
+  message: string;
+}
+
+export interface ISubmitSupportResponse {
+  success: boolean;
+  message: string;
+  data?: unknown;
+}

@@ -4,7 +4,11 @@ import TagTypes from "@/constants/tagType.constant";
 import { ErrorToast, SuccessToast } from "@/helpers/ValidationHelper";
 import { setUserInfo, getUserInfo } from "@/helpers/SessionHelper";
 import { IParam } from "@/types/global.type";
-import { IProfileResponse } from "@/types/user.type";
+import {
+  IProfileResponse,
+  IAgentProfileResponse,
+  ISubAgentProfileResponse,
+} from "@/types/user.type";
 import {
   IGetPatientsResponse,
   IPatientQueryParams,
@@ -126,9 +130,17 @@ export const userApi = apiSlice.injectEndpoints({
       providesTags: [TagTypes.USERS],
     }),
 
-    getMyProfile: builder.query<IProfileResponse, void>({
+    getMyProfile: builder.query<IAgentProfileResponse, void>({
       query: () => ({
         url: "/user/my-profile",
+        method: "GET",
+      }),
+      providesTags: [TagTypes.PROFILE, TagTypes.USERS],
+    }),
+
+    getSubAgentProfile: builder.query<ISubAgentProfileResponse, void>({
+      query: () => ({
+        url: "/user/sub-agent-profile",
         method: "GET",
       }),
       providesTags: [TagTypes.PROFILE, TagTypes.USERS],
@@ -204,5 +216,6 @@ export const {
   useGetCustomersQuery,
   useGetCustomersByShopIdQuery,
   useGetMyProfileQuery,
+  useGetSubAgentProfileQuery,
   useUpdateProfileMutation,
 } = userApi;

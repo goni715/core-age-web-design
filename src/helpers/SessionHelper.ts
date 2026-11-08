@@ -95,6 +95,7 @@ class SessionHelper {
     profileImg?: string;
     role?: string;
     phone?: string;
+    agencyName?: string;
     _id?: string;
     userId?: string;
   }) => {
@@ -104,6 +105,7 @@ class SessionHelper {
       if (userInfo?.profileImg !== undefined) localStorage.setItem("profileImg", userInfo.profileImg || "");
       if (userInfo?.role !== undefined) localStorage.setItem("role", userInfo.role || "");
       if (userInfo?.phone !== undefined) localStorage.setItem("phone", userInfo.phone || "");
+      if (userInfo?.agencyName !== undefined) localStorage.setItem("agencyName", userInfo.agencyName || "");
       const id = userInfo?._id || userInfo?.userId;
       if (id !== undefined) localStorage.setItem("userId", id || "");
     }
@@ -117,10 +119,11 @@ class SessionHelper {
         profileImg: localStorage.getItem("profileImg") || "",
         role: localStorage.getItem("role") || "",
         phone: localStorage.getItem("phone") || "",
+        agencyName: localStorage.getItem("agencyName") || "",
         userId: localStorage.getItem("userId") || "",
       };
     }
-    return { fullName: "", email: "", profileImg: "", role: "", phone: "", userId: "" };
+    return { fullName: "", email: "", profileImg: "", role: "", phone: "", agencyName: "", userId: "" };
   };
 
   removeUserInfo = () => {
@@ -130,6 +133,7 @@ class SessionHelper {
       localStorage.removeItem("profileImg");
       localStorage.removeItem("role");
       localStorage.removeItem("phone");
+      localStorage.removeItem("agencyName");
       localStorage.removeItem("userId");
     }
   };

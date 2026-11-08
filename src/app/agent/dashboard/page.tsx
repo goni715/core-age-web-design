@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { User, Clock, Check, ArrowUpRight, Share2, Plus } from "lucide-react";
+import { User, Clock, Check, ArrowUpRight, Share2, Plus, ShieldCheck, AlertCircle } from "lucide-react";
 import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import {
@@ -10,11 +10,29 @@ import {
   useGetReferralPartnerStatsQuery,
 } from "@/redux/features/referralPartner/referralPartnerApi";
 import { useGetPatientsByAgentQuery } from "@/redux/features/agentPatient/agentPatientApi";
+import { useGetMyProfileQuery } from "@/redux/features/user/userApi";
+import { setUserInfo } from "@/helpers/SessionHelper";
 
 export default function AgentDashboard() {
+  const { data: profileResponse } = useGetMyProfileQuery();
+  const profile = profileResponse?.data;
+
   const { data: networkData } = useGetMyNetworksQuery({ limit: 5 });
   const { data: statsData } = useGetReferralPartnerStatsQuery();
   const { data: patientsData } = useGetPatientsByAgentQuery({ limit: 5 });
+
+  useEffect(() => {
+    if (profile) {
+      setUserInfo({
+        fullName: profile.fullName,
+        email: profile.email,
+        phone: profile.phone,
+        agencyName: profile.agencyName,
+        role: "agent",
+        userId: profile.userId || profile._id,
+      });
+    }
+  }, [profile]);
 
   const totalPartners =
     statsData?.data?.overviewStats?.referralPartners ??
@@ -134,14 +152,37 @@ export default function AgentDashboard() {
       {/* Quick Action Banner */}
       <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg shadow-blue-500/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div className="space-y-1.5">
-          <span className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-white/20 text-white backdrop-blur-xs">
-            Channel Partner Workspace
-          </span>
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-white/20 text-white backdrop-blur-xs">
+              {profile?.agencyName ? `${profile.agencyName} • Channel Partner` : "Channel Partner Workspace"}
+            </span>
+            {profile?.approvalStatus && (
+              <span
+                className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold tracking-wide uppercase backdrop-blur-xs ${
+                  profile.approvalStatus === "approved"
+                    ? "bg-emerald-500/30 text-emerald-100 border border-emerald-400/30"
+                    : "bg-amber-500/30 text-amber-100 border border-amber-400/30"
+                }`}
+              >
+                {profile.approvalStatus === "approved" ? (
+                  <>
+                    <ShieldCheck className="w-3 h-3 text-emerald-300" />
+                    <span>Verified</span>
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-3 h-3 text-amber-300" />
+                    <span>Approval Pending</span>
+                  </>
+                )}
+              </span>
+            )}
+          </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Expand Your Medical Referral Network
+            {profile?.fullName ? `Welcome back, ${profile.fullName}!` : "Expand Your Medical Referral Network"}
           </h2>
           <p className="text-blue-100 text-xs sm:text-sm max-w-xl">
-            Onboard new sub-agents, submit high-priority patient travel cases, and track your multi-tier hospital commission payouts.
+            Onboard new referral partners, submit high-priority patient travel cases, and track your multi-tier hospital commission payouts.
           </p>
         </div>
 

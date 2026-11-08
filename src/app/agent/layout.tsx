@@ -29,6 +29,7 @@ import { useLogoutMutation } from "@/redux/features/auth/authApi";
 import { useGenerateInvitationLinkMutation } from "@/redux/features/referralPartner/referralPartnerApi";
 import { SuccessToast, ErrorToast } from "@/helpers/ValidationHelper";
 import AgentRoute from "@/providers/AgentRoute";
+import { useGetMyProfileQuery } from "@/redux/features/user/userApi";
 
 export default function AgentLayout({
   children,
@@ -39,6 +40,9 @@ export default function AgentLayout({
   const pathname = usePathname();
   const router = useRouter();
 
+  const { data: profileResponse } = useGetMyProfileQuery();
+  const profile = profileResponse?.data;
+
   const [logout] = useLogoutMutation();
   const [generateInvitationLink, { isLoading: isGeneratingInviteLink }] =
     useGenerateInvitationLinkMutation();
@@ -48,12 +52,13 @@ export default function AgentLayout({
     fullName: "Channel Partner",
     email: "",
     initials: "CP",
+    agencyName: "",
   });
 
   useEffect(() => {
     const user = getUserInfo();
-    const name = user.fullName || "Channel Partner";
-    const parts = name.trim().split(" ");
+    const name = profile?.fullName || user.fullName || "Channel Partner";
+    const parts = name.trim().split(" ").filter(Boolean);
     const initials =
       parts.length > 1
         ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
@@ -61,10 +66,11 @@ export default function AgentLayout({
 
     setUserInfoState({
       fullName: name,
-      email: user.email || "",
+      email: profile?.email || user.email || "",
       initials,
+      agencyName: profile?.agencyName || user.agencyName || "",
     });
-  }, []);
+  }, [profile]);
 
   const handleInvitePartner = async () => {
     try {
@@ -238,10 +244,10 @@ export default function AgentLayout({
           <div className="p-4 mt-auto shrink-0 space-y-2">
             <div className="bg-[#0051a8]/80 border border-white/10 rounded-2xl p-4 text-white shadow-xs">
               <div className="text-[11px] text-blue-200/90 font-normal">
-                Reporting to
+                {profile?.agencyName ? "Master Agency" : "Reporting to"}
               </div>
-              <div className="font-bold text-sm text-white tracking-tight mt-0.5">
-                3S Medi Care Int
+              <div className="font-bold text-sm text-white tracking-tight mt-0.5 truncate" title={profile?.agencyName || "3S Medi Care Int"}>
+                {profile?.agencyName || "3S Medi Care Int"}
               </div>
               <div className="text-[11px] text-blue-200/80 font-normal mt-0.5">
                 Channel Partner Direct

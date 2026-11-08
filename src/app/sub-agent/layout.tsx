@@ -25,6 +25,7 @@ import { subAgentSidebarLinks } from "@/data/sidebar.data";
 import { Button } from "@/components/ui/button";
 import { clearSession, getUserInfo } from "@/helpers/SessionHelper";
 import { useLogoutMutation } from "@/redux/features/auth/authApi";
+import { useGetSubAgentProfileQuery } from "@/redux/features/user/userApi";
 import SubAgentRoute from "@/providers/SubAgentRoute";
 
 export default function SubAgentLayout({
@@ -36,18 +37,22 @@ export default function SubAgentLayout({
   const pathname = usePathname();
   const router = useRouter();
 
+  const { data: profileResponse } = useGetSubAgentProfileQuery();
+  const profile = profileResponse?.data;
+
   const [logout] = useLogoutMutation();
 
   const [userInfo, setUserInfoState] = useState({
     fullName: "Sub-Agent Partner",
     email: "",
     initials: "SA",
+    agencyName: "",
   });
 
   useEffect(() => {
     const user = getUserInfo();
-    const name = user.fullName || "Sub-Agent Partner";
-    const parts = name.trim().split(" ");
+    const name = profile?.fullName || user.fullName || "Sub-Agent Partner";
+    const parts = name.trim().split(" ").filter(Boolean);
     const initials =
       parts.length > 1
         ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
@@ -55,10 +60,11 @@ export default function SubAgentLayout({
 
     setUserInfoState({
       fullName: name,
-      email: user.email || "",
+      email: profile?.email || user.email || "",
       initials,
+      agencyName: profile?.agencyName || user.agencyName || "",
     });
-  }, []);
+  }, [profile]);
 
   const handleLogout = async () => {
     try {
@@ -216,13 +222,13 @@ export default function SubAgentLayout({
             >
               <div className="text-[11px] text-teal-200/90 font-normal flex items-center gap-1.5">
                 <Sparkles className="w-3.5 h-3.5 text-teal-300" />
-                <span>Reporting to</span>
+                <span>Reporting Channel Partner</span>
               </div>
-              <div className="font-bold text-sm text-white tracking-tight mt-0.5">
-                Master Channel Partner
+              <div className="font-bold text-sm text-white tracking-tight mt-0.5 truncate" title={profile?.agentName}>
+                {profile?.agentName || "Master Channel Partner"}
               </div>
-              <div className="text-[11px] text-teal-200/80 font-normal mt-0.5">
-                3S Healthcare Network
+              <div className="text-[11px] text-teal-200/80 font-normal mt-0.5 truncate">
+                {profile?.agentPhone || "3S Healthcare Network"}
               </div>
             </div>
 

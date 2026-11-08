@@ -103,23 +103,23 @@ export default function AgentCommissionPage() {
   const monthlyData =
     stats?.monthlyEarnings && stats.monthlyEarnings.length > 0
       ? stats.monthlyEarnings.map((m) => ({
-          name: m.month,
-          earnings: m.earnings ?? m.commission ?? 0,
-        }))
+        name: m.month,
+        earnings: m.earnings ?? m.commission ?? 0,
+      }))
       : [
-          { name: "Jan", earnings: 0 },
-          { name: "Feb", earnings: 0 },
-          { name: "Mar", earnings: 0 },
-          { name: "Apr", earnings: 0 },
-          { name: "May", earnings: 0 },
-          { name: "Jun", earnings: 0 },
-          { name: "Jul", earnings: 0 },
-          { name: "Aug", earnings: 0 },
-          { name: "Sep", earnings: 0 },
-          { name: "Oct", earnings: 0 },
-          { name: "Nov", earnings: 0 },
-          { name: "Dec", earnings: 0 },
-        ];
+        { name: "Jan", earnings: 0 },
+        { name: "Feb", earnings: 0 },
+        { name: "Mar", earnings: 0 },
+        { name: "Apr", earnings: 0 },
+        { name: "May", earnings: 0 },
+        { name: "Jun", earnings: 0 },
+        { name: "Jul", earnings: 0 },
+        { name: "Aug", earnings: 0 },
+        { name: "Sep", earnings: 0 },
+        { name: "Oct", earnings: 0 },
+        { name: "Nov", earnings: 0 },
+        { name: "Dec", earnings: 0 },
+      ];
 
   const getStatusBadge = (status?: string) => {
     switch ((status || "").toLowerCase()) {
@@ -161,7 +161,7 @@ export default function AgentCommissionPage() {
           </p>
         </div>
         <Button className="bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2.5 px-5 rounded-xl shadow-md shadow-amber-200 text-sm shrink-0 cursor-pointer">
-          <TkIcon className="w-4 h-4 mr-1.5" /> Request Payout
+          <TkIcon className="w-4 h-4 mr-1.5" />
         </Button>
       </div>
 
@@ -296,11 +296,10 @@ export default function AgentCommissionPage() {
                   setActiveTab(tab.key);
                   setCurrentPage(1);
                 }}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
-                  activeTab === tab.key
+                className={`px-3.5 py-1.5 rounded-full text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${activeTab === tab.key
                     ? "bg-[#0a2540] text-white shadow-xs"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
+                  }`}
               >
                 {tab.label}
               </button>

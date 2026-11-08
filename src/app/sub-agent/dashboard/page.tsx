@@ -1,14 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
-import { User, Clock, Check, ArrowUpRight, Plus, Sparkles, Building2 } from "lucide-react";
+import { User, Clock, Check, ArrowUpRight, Plus, Sparkles, Building2, Phone, Mail } from "lucide-react";
 import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import { useGetPatientsBySubAgentQuery } from "@/redux/features/agentPatient/agentPatientApi";
+import { useGetSubAgentProfileQuery } from "@/redux/features/user/userApi";
+import { setUserInfo } from "@/helpers/SessionHelper";
 
 export default function SubAgentDashboard() {
+  const { data: profileResponse } = useGetSubAgentProfileQuery();
+  const profile = profileResponse?.data;
+
   const { data: patientsData, isLoading } = useGetPatientsBySubAgentQuery({ limit: 5 });
+
+  useEffect(() => {
+    if (profile) {
+      setUserInfo({
+        fullName: profile.fullName,
+        email: profile.email,
+        phone: profile.phone,
+        agencyName: profile.agencyName,
+        role: "sub_agent",
+        userId: profile._id,
+      });
+    }
+  }, [profile]);
 
   const totalCases = patientsData?.meta?.total || 14;
   const ongoingCases = patientsData?.statusCounts?.ongoing || 2;
@@ -108,14 +126,14 @@ export default function SubAgentDashboard() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-white/20 text-white backdrop-blur-xs border border-white/20">
               <Sparkles className="w-3.5 h-3.5 text-teal-200" />
-              Sub-Agent Referral Portal
+              {profile?.agencyName ? `${profile.agencyName} • Referral Partner` : "Sub-Agent Referral Portal"}
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
-            Refer Patients & Track Direct Commissions
+            {profile?.fullName ? `Welcome back, ${profile.fullName}!` : "Refer Patients & Track Direct Commissions"}
           </h2>
           <p className="text-teal-100 text-xs sm:text-sm max-w-xl leading-relaxed">
-            Submit medical travel cases directly for visa processing, expert hospital quotations, and prompt referral payouts.
+            Submit medical travel cases directly for visa processing, expert hospital quotations, and prompt referral payouts in Bangladeshi Taka (TK).
           </p>
         </div>
 
@@ -170,12 +188,12 @@ export default function SubAgentDashboard() {
                 My Recent Patient Referrals
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Cases you submitted for overseas hospital treatment
+                Real-time tracking of patients you referred for overseas treatment
               </p>
             </div>
             <Link
               href="/sub-agent/patients"
-              className="text-xs font-bold text-teal-600 hover:text-teal-700 flex items-center gap-1 hover:underline"
+              className="text-xs font-bold text-teal-700 hover:text-teal-800 flex items-center gap-1 hover:underline cursor-pointer"
             >
               <span>View all cases</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
@@ -186,10 +204,10 @@ export default function SubAgentDashboard() {
             {recentCases.map((c, i) => (
               <div
                 key={i}
-                className="py-3.5 flex items-center justify-between gap-4 hover:bg-teal-50/40 px-2 rounded-xl transition-colors"
+                className="py-3.5 flex items-center justify-between gap-4 hover:bg-teal-50/30 px-2 rounded-xl transition-colors"
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-100">
+                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-200">
                     {c.initials}
                   </div>
                   <div className="min-w-0">
@@ -225,26 +243,42 @@ export default function SubAgentDashboard() {
             <div>
               <div className="flex items-center gap-2 text-xs font-bold text-teal-800 uppercase tracking-wider">
                 <Building2 className="w-4 h-4 text-teal-600" />
-                <span>Reporting Channel Partner</span>
+                <span>Supervising Channel Partner</span>
               </div>
               <h3 className="font-bold text-slate-900 text-lg mt-1">
-                3S Medi Care Int
+                {profile?.agentName || "3S Medi Care Int"}
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
                 Master partner handling clinical records, visa desk & payouts
               </p>
+              {(profile?.agentEmail || profile?.agentPhone) && (
+                <div className="mt-2 text-xs space-y-1 text-slate-600">
+                  {profile.agentEmail && (
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Mail className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                      <span className="truncate">{profile.agentEmail}</span>
+                    </div>
+                  )}
+                  {profile.agentPhone && (
+                    <div className="flex items-center gap-1.5">
+                      <Phone className="w-3.5 h-3.5 text-teal-600 shrink-0" />
+                      <span>{profile.agentPhone}</span>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="bg-teal-50/70 p-4 rounded-2xl border border-teal-100 text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-slate-500">Your Partner Status:</span>
                 <span className="font-bold text-emerald-700 bg-white px-2 py-0.5 rounded-md shadow-2xs">
-                  Active Sub-Agent
+                  Active Referral Partner
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Average Payout:</span>
-                <span className="font-bold text-slate-800">$350 - $1,200 / case</span>
+                <span className="text-slate-500">Commission Settlement:</span>
+                <span className="font-bold text-slate-800">Direct per case in TK</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Hospital Acceptance:</span>
