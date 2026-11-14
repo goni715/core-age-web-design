@@ -26,6 +26,26 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== 'undefined' && !('documentPictureInPicture' in window)) {
+                try {
+                  window.documentPictureInPicture = {
+                    requestWindow: async function() { return null; },
+                    window: null,
+                    onenter: null,
+                    addEventListener: function() {},
+                    removeEventListener: function() {},
+                    dispatchEvent: function() { return false; }
+                  };
+                } catch (e) {}
+              }
+            `,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col">
         <NextTopLoader
           color="#EC4899"
