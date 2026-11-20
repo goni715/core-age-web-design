@@ -314,6 +314,40 @@ export const authApi = apiSlice.injectEndpoints({
         }
       },
     }),
+    registerPartner: builder.mutation<
+      { success: boolean; message: string; statusCode?: number; data?: unknown },
+      {
+        fullName: string;
+        email: string;
+        phone: string;
+        agencyName: string;
+        password: string;
+      }
+    >({
+      query: (data) => ({
+        url: "/auth/register-partner",
+        method: "POST",
+        body: data,
+      }),
+      async onQueryStarted(_arg, { queryFulfilled, dispatch }) {
+        try {
+          const res = await queryFulfilled;
+          SuccessToast(
+            res?.data?.message || "Partner is registered successfully"
+          );
+        } catch (err: any) {
+          const status = err?.error?.status;
+          const message =
+            err?.error?.data?.message ||
+            "Registration failed. Please try again.";
+          if (status === 500) {
+            dispatch(SetRegisterError("Something Went Wrong"));
+          } else {
+            dispatch(SetRegisterError(message));
+          }
+        }
+      },
+    }),
     registerAgent: builder.mutation({
       query: (data) => ({
         url: "/auth/register-agent",
@@ -376,6 +410,7 @@ export const authApi = apiSlice.injectEndpoints({
 export const {
   useLoginMutation,
   useLoginSubAgentMutation,
+  useRegisterPartnerMutation,
   useRegisterAgentMutation,
   useVerifyAccountMutation,
   useLogoutMutation,

@@ -16,14 +16,14 @@ export default function LandingFooter() {
               Ready to start referring?
             </h2>
             <p className="text-blue-100 text-xs sm:text-sm md:text-base leading-relaxed">
-              Register as a Channel Partner, or sign in to your Referral Partner account to submit and manage patients.
+              Register as a Referral Partner, or sign in to your partner account to submit and manage patients.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
             <Link href="/sign-up">
               <Button className="bg-white text-blue-700 hover:bg-blue-50 font-bold px-6 py-2.5 rounded-xl text-sm shadow-md cursor-pointer border-0">
-                Register as Channel Partner
+                Register as Referral Partner
               </Button>
             </Link>
             <Link href="/login">

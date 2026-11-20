@@ -80,7 +80,7 @@ export default function LandingView({ authCard }: LandingViewProps) {
             <div className="flex flex-wrap items-center gap-3.5 pt-2">
               <Link href="/sign-up">
                 <Button className="bg-[#00cba0] hover:bg-[#00b58e] text-slate-900 font-bold px-6 py-3 rounded-xl text-sm shadow-md cursor-pointer border-0 flex items-center gap-2">
-                  <span>Register as Channel Partner</span>
+                  <span>Register as Referral Partner</span>
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
@@ -175,9 +175,14 @@ export default function LandingView({ authCard }: LandingViewProps) {
                 </ul>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 space-y-2">
+                <Link href="/sign-up">
+                  <Button className="w-full bg-[#00cba0] hover:bg-[#00b58e] text-slate-900 font-bold py-2.5 rounded-xl text-sm shadow-xs cursor-pointer border-0">
+                    Register as Referral Partner
+                  </Button>
+                </Link>
                 <Link href="/login?role=sub-agent">
-                  <Button className="w-full bg-[#005ca9] hover:bg-[#004e90] text-white font-bold py-2.5 rounded-xl text-sm shadow-xs cursor-pointer">
+                  <Button variant="outline" className="w-full border-slate-200 text-slate-700 font-semibold py-2 rounded-xl text-xs hover:bg-slate-50 cursor-pointer">
                     Sign In as Referral Partner
                   </Button>
                 </Link>
@@ -228,10 +233,13 @@ export default function LandingView({ authCard }: LandingViewProps) {
                 </ul>
               </div>
 
-              <div className="pt-2">
-                <Link href="/sign-up">
+              <div className="pt-2 space-y-2">
+                <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                  Channel Partner accounts are provisioned exclusively by administration.
+                </div>
+                <Link href="/login?role=agent">
                   <Button className="w-full bg-[#005ca9] hover:bg-[#004e90] text-white font-bold py-2.5 rounded-xl text-sm shadow-xs cursor-pointer">
-                    Register as Channel Partner
+                    Sign In as Channel Partner
                   </Button>
                 </Link>
               </div>

@@ -33,9 +33,9 @@ const LoginForm = () => {
   const callbackUrl = searchParams.get("callbackUrl") || "/";
   const roleParam = searchParams.get("role");
   const defaultRole: TRole =
-    roleParam === "sub-agent" || roleParam === "subagent" || roleParam === "referral-partner"
-      ? "sub-agent"
-      : "agent";
+    roleParam === "agent" || roleParam === "channel-partner"
+      ? "agent"
+      : "sub-agent";
 
   const [role, setRole] = useState<TRole>(defaultRole);
   const [loginAgent, { isLoading: isAgentLoading }] = useLoginMutation();
@@ -130,22 +130,8 @@ const LoginForm = () => {
 
   return (
     <div className="space-y-5">
-      {/* 1. Pill Toggle between Channel Partner and Referral Partner */}
+      {/* 1. Pill Toggle between Referral Partner and Channel Partner */}
       <div className="p-1 bg-slate-100/90 rounded-2xl flex items-center gap-1">
-        <button
-          type="button"
-          onClick={() => handleRoleChange("agent")}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer",
-            role === "agent"
-              ? "bg-[#005ca9] text-white shadow-xs font-bold"
-              : "text-slate-600 hover:text-slate-900"
-          )}
-        >
-          <Share2 className="w-4 h-4 shrink-0" />
-          <span>Channel Partner</span>
-        </button>
-
         <button
           type="button"
           onClick={() => handleRoleChange("sub-agent")}
@@ -158,6 +144,20 @@ const LoginForm = () => {
         >
           <UserPlus className="w-4 h-4 shrink-0" />
           <span>Referral Partner</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleRoleChange("agent")}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer",
+            role === "agent"
+              ? "bg-[#005ca9] text-white shadow-xs font-bold"
+              : "text-slate-600 hover:text-slate-900"
+          )}
+        >
+          <Share2 className="w-4 h-4 shrink-0" />
+          <span>Channel Partner</span>
         </button>
       </div>
 
@@ -265,22 +265,30 @@ const LoginForm = () => {
       {/* 4. Switch to Sign Up */}
       <div className="pt-2 text-center text-xs text-slate-500">
         {role === "sub-agent" ? (
-          <span>
-            Need a Referral Partner account?{" "}
-            <span className="text-slate-700 font-semibold">
-              Join via an invitation link from your Channel Partner
-            </span>
-          </span>
+          <div className="space-y-1">
+            <div>
+              New Referral Partner?{" "}
+              <Link
+                href="/sign-up"
+                className="text-blue-600 font-bold hover:underline"
+              >
+                Register as Referral Partner
+              </Link>
+            </div>
+            <div>
+              Have a Channel Partner invitation token?{" "}
+              <Link
+                href="/referral"
+                className="text-emerald-700 font-semibold hover:underline"
+              >
+                Join via Invitation Code
+              </Link>
+            </div>
+          </div>
         ) : (
-          <span>
-            New Channel Partner?{" "}
-            <Link
-              href="/sign-up"
-              className="text-blue-600 font-bold hover:underline"
-            >
-              Register as Channel Partner
-            </Link>
-          </span>
+          <div className="p-2 bg-slate-50 rounded-xl border border-slate-200/80 text-[11px] text-slate-600">
+            Channel Partner master accounts are provisioned exclusively by administration. Please sign in with your authorized credentials.
+          </div>
         )}
       </div>
     </div>

@@ -372,15 +372,26 @@ const SubAgentRegisterForm: React.FC<SubAgentRegisterFormProps> = ({
         </button>
       </form>
 
-      {/* Switch to Login */}
-      <div className="pt-2 text-center text-xs text-slate-500">
-        Already have an account?{" "}
-        <Link
-          href="/login?role=sub-agent"
-          className="text-teal-700 font-bold hover:underline"
-        >
-          Sign In
-        </Link>
+      {/* Switch to Login / Direct Register */}
+      <div className="pt-2 text-center text-xs text-slate-500 space-y-1.5">
+        <div>
+          Already have an account?{" "}
+          <Link
+            href="/login?role=sub-agent"
+            className="text-teal-700 font-bold hover:underline"
+          >
+            Sign In
+          </Link>
+        </div>
+        <div>
+          Don&apos;t have an invitation code?{" "}
+          <Link
+            href="/sign-up"
+            className="text-blue-600 font-bold hover:underline"
+          >
+            Direct Referral Partner Sign-Up
+          </Link>
+        </div>
       </div>
     </div>
   );
