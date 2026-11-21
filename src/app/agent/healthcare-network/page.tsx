@@ -147,8 +147,7 @@ export default function AgentHealthcareNetworkPage() {
       )}
 
       {/* Hospital Listing Card */}
-      <Card className="bg-white rounded-3xl border border-slate-200/80 shadow-2xs overflow-hidden">
-        {/* Card Header with Search */}
+      {/* <Card className="bg-white rounded-3xl border border-slate-200/80 shadow-2xs overflow-hidden">
         <div className="p-4 sm:p-6 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div>
             <h3 className="font-bold text-slate-900 text-base">
@@ -171,9 +170,7 @@ export default function AgentHealthcareNetworkPage() {
           </div>
         </div>
 
-        {/* Content Section: Skeleton Loading vs Empty vs Hospital Rows */}
         {isHospitalsLoading || isHospitalsFetching ? (
-          /* Hospitals Skeleton Loading */
           <div className="divide-y divide-slate-100">
             {[1, 2, 3].map((i) => (
               <div
@@ -192,7 +189,6 @@ export default function AgentHealthcareNetworkPage() {
             ))}
           </div>
         ) : hospitals.length === 0 ? (
-          /* Empty State */
           <div className="py-14 text-center space-y-2 px-4">
             <div className="w-10 h-10 rounded-xl bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
               <Building2 className="w-5 h-5" />
@@ -207,7 +203,6 @@ export default function AgentHealthcareNetworkPage() {
             </p>
           </div>
         ) : (
-          /* Real Hospitals List */
           <div className="divide-y divide-slate-100">
             {hospitals.map((hospital) => {
               const addressText = hospital.address || hospital.city || currentCountry.name;
@@ -253,7 +248,7 @@ export default function AgentHealthcareNetworkPage() {
             })}
           </div>
         )}
-      </Card>
+      </Card> */}
     </div>
   );
 }
