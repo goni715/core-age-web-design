@@ -209,7 +209,7 @@ export default function AgentProfilePage() {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Account Type:</span>
                   <span className="font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded-md">
-                    Direct Agent
+                    Channel Partner
                   </span>
                 </div>
                 <div className="flex items-center justify-between">

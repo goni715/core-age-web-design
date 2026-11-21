@@ -43,15 +43,15 @@ export default function SubAgentLayout({
   const [logout] = useLogoutMutation();
 
   const [userInfo, setUserInfoState] = useState({
-    fullName: "Sub-Agent Partner",
+    fullName: "Referral Partner",
     email: "",
-    initials: "SA",
+    initials: "RP",
     agencyName: "",
   });
 
   useEffect(() => {
     const user = getUserInfo();
-    const name = profile?.fullName || user.fullName || "Sub-Agent Partner";
+    const name = profile?.fullName || user.fullName || "Referral Partner";
     const parts = name.trim().split(" ").filter(Boolean);
     const initials =
       parts.length > 1
@@ -79,49 +79,49 @@ export default function SubAgentLayout({
   const getHeaderMeta = () => {
     if (pathname.startsWith("/sub-agent/patients")) {
       return {
-        badge: "SUB-AGENT REFERRAL NETWORK",
+        badge: "REFERRAL PARTNER NETWORK",
         title: "My Referred Cases",
         desc: "Track the journey, treatment milestones, and referral commission of your patients",
       };
     }
     if (pathname.startsWith("/sub-agent/submit-patient")) {
       return {
-        badge: "SUB-AGENT REFERRAL NETWORK",
+        badge: "REFERRAL PARTNER NETWORK",
         title: "Submit New Patient Case",
         desc: "Refer a new patient to 3S specialist hospitals for consultation and medical travel",
       };
     }
     if (pathname.startsWith("/sub-agent/commission")) {
       return {
-        badge: "SUB-AGENT REFERRAL NETWORK",
+        badge: "REFERRAL PARTNER NETWORK",
         title: "Referral Earnings",
         desc: "View your earned referral fees, completed payouts, and pending approvals",
       };
     }
     if (pathname.startsWith("/sub-agent/healthcare-network")) {
       return {
-        badge: "SUB-AGENT REFERRAL NETWORK",
+        badge: "REFERRAL PARTNER NETWORK",
         title: "Global Hospital Network",
         desc: "Explore accredited international hospitals to help patients choose top care",
       };
     }
     if (pathname.startsWith("/sub-agent/support")) {
       return {
-        badge: "SUB-AGENT REFERRAL NETWORK",
-        title: "Sub-Agent Support",
+        badge: "REFERRAL PARTNER NETWORK",
+        title: "Referral Partner Support",
         desc: "Direct coordination with 3S medical desk and your Master Channel Partner",
       };
     }
     if (pathname.startsWith("/sub-agent/profile")) {
       return {
-        badge: "SUB-AGENT REFERRAL NETWORK",
-        title: "Sub-Agent Profile",
+        badge: "REFERRAL PARTNER NETWORK",
+        title: "Referral Partner Profile",
         desc: "Manage your contact info, clinic details, and payment preferences",
       };
     }
     return {
-      badge: "SUB-AGENT REFERRAL NETWORK",
-      title: "Sub-Agent Portal",
+      badge: "REFERRAL PARTNER NETWORK",
+      title: "Referral Partner Portal",
       desc: "Welcome back! View your referred patient cases, progress status, and rewards.",
     };
   };
@@ -162,7 +162,7 @@ export default function SubAgentLayout({
                   3S Medi Care Int
                 </span>
                 <span className="text-[11px] text-teal-200/90 font-normal block leading-tight mt-0.5">
-                  Sub-Agent Portal
+                  Referral Partner Portal
                 </span>
               </div>
             </Link>
@@ -289,7 +289,7 @@ export default function SubAgentLayout({
                         {userInfo.fullName}
                       </div>
                       <div className="text-[11px] text-teal-700 font-medium">
-                        Sub-Agent
+                        Referral Partner
                       </div>
                     </div>
                     <ChevronDown className="w-4 h-4 text-slate-400 hidden md:block" />
@@ -309,7 +309,7 @@ export default function SubAgentLayout({
                           </div>
                         )}
                         <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-50 text-teal-700 border border-teal-200/60">
-                          Sub-Agent Partner
+                          Referral Partner
                         </span>
                       </DropdownMenuLabel>
                     </DropdownMenuGroup>

@@ -7,11 +7,15 @@ import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
 import { useGetPatientsBySubAgentQuery } from "@/redux/features/agentPatient/agentPatientApi";
 import { useGetSubAgentProfileQuery } from "@/redux/features/user/userApi";
+import { useGetSubAgentStatsQuery } from "@/redux/features/dashboard/dashboardApi";
 import { setUserInfo } from "@/helpers/SessionHelper";
 
 export default function SubAgentDashboard() {
   const { data: profileResponse } = useGetSubAgentProfileQuery();
   const profile = profileResponse?.data;
+
+  const { data: statsResponse, isLoading: isStatsLoading } = useGetSubAgentStatsQuery();
+  const subAgentStats = statsResponse?.data;
 
   const { data: patientsData, isLoading } = useGetPatientsBySubAgentQuery({ limit: 5 });
 
@@ -28,35 +32,39 @@ export default function SubAgentDashboard() {
     }
   }, [profile]);
 
-  const totalCases = patientsData?.meta?.total || 14;
-  const ongoingCases = patientsData?.statusCounts?.ongoing || 2;
-  const completedCases = patientsData?.statusCounts?.completed || 12;
+  const totalCases = subAgentStats?.myTotalCases ?? patientsData?.meta?.total ?? 0;
+  const ongoingCases = subAgentStats?.ongoingTreatment ?? patientsData?.statusCounts?.ongoing ?? 0;
+  const completedCases = subAgentStats?.completedCases ?? patientsData?.statusCounts?.completed ?? 0;
+  const referralEarnings = subAgentStats?.myReferralEarnings ?? 0;
+  const currencySymbol = subAgentStats?.currency || "TK";
 
   const stats = [
     {
       label: "My Total Cases",
-      value: String(totalCases),
+      value: isStatsLoading ? "..." : String(totalCases),
       icon: User,
       iconBg: "bg-teal-50",
       iconColor: "text-teal-600",
     },
     {
       label: "Ongoing Treatment",
-      value: String(ongoingCases),
+      value: isStatsLoading ? "..." : String(ongoingCases),
       icon: Clock,
       iconBg: "bg-amber-50",
       iconColor: "text-amber-600",
     },
     {
       label: "Completed Cases",
-      value: String(completedCases),
+      value: isStatsLoading ? "..." : String(completedCases),
       icon: Check,
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-600",
     },
     {
       label: "My Referral Earnings",
-      value: "TK 4,280",
+      value: isStatsLoading
+        ? "..."
+        : `${currencySymbol} ${Number(referralEarnings).toLocaleString()}`,
       icon: TkIcon,
       iconBg: "bg-emerald-50",
       iconColor: "text-emerald-700",
@@ -85,39 +93,11 @@ export default function SubAgentDashboard() {
             ? "bg-amber-50 text-amber-700 border-amber-200"
             : "bg-teal-50 text-teal-700 border-teal-200",
       }))
-    : [
-        {
-          initials: "TH",
-          name: "Tariq Hasan",
-          id: "CS-2849",
-          treatment: "Coronary Angioplasty",
-          country: "India",
-          status: "Ongoing",
-          statusBadge: "bg-teal-50 text-teal-700 border-teal-200",
-        },
-        {
-          initials: "RB",
-          name: "Ruma Begum",
-          id: "CS-2848",
-          treatment: "Knee Replacement Surgery",
-          country: "Thailand",
-          status: "Under review",
-          statusBadge: "bg-amber-50 text-amber-700 border-amber-200",
-        },
-        {
-          initials: "KM",
-          name: "Kamal Mustafa",
-          id: "CS-2841",
-          treatment: "Chemotherapy & Oncology",
-          country: "Singapore",
-          status: "Completed",
-          statusBadge: "bg-emerald-50 text-emerald-700 border-emerald-200",
-        },
-      ];
+    : [];
 
   return (
     <div className="max-w-[1360px] mx-auto space-y-6">
-      {/* Sub-Agent Welcome Banner */}
+      {/* Referral Partner Welcome Banner */}
       <div
         style={{ background: "linear-gradient(135deg, #0d5c56 0%, #0f766e 45%, #059669 100%)" }}
         className="rounded-3xl p-6 sm:p-8 text-white shadow-xl shadow-teal-900/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 relative overflow-hidden"
@@ -126,7 +106,7 @@ export default function SubAgentDashboard() {
           <div className="flex items-center gap-2">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold tracking-wide uppercase bg-white/20 text-white backdrop-blur-xs border border-white/20">
               <Sparkles className="w-3.5 h-3.5 text-teal-200" />
-              {profile?.agencyName ? `${profile.agencyName} • Referral Partner` : "Sub-Agent Referral Portal"}
+              {profile?.agencyName ? `${profile.agencyName} • Referral Partner` : "Referral Partner Portal"}
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
@@ -201,39 +181,58 @@ export default function SubAgentDashboard() {
           </div>
 
           <div className="divide-y divide-slate-100">
-            {recentCases.map((c, i) => (
-              <div
-                key={i}
-                className="py-3.5 flex items-center justify-between gap-4 hover:bg-teal-50/30 px-2 rounded-xl transition-colors"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-200">
-                    {c.initials}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-bold text-slate-900 text-sm truncate">
-                        {c.name}
-                      </span>
-                      <span className="text-[11px] font-mono text-slate-400">
-                        {c.id}
-                      </span>
-                    </div>
-                    <div className="text-xs text-slate-500 truncate mt-0.5">
-                      {c.treatment} • Destination: {c.country}
-                    </div>
-                  </div>
+            {recentCases.length === 0 ? (
+              <div className="py-10 text-center flex flex-col items-center justify-center">
+                <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-2">
+                  <User className="w-6 h-6" />
                 </div>
-
-                <div className="flex items-center gap-3 shrink-0">
-                  <span
-                    className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${c.statusBadge}`}
-                  >
-                    {c.status}
-                  </span>
-                </div>
+                <p className="text-xs font-bold text-slate-800">No recent cases</p>
+                <p className="text-[11px] text-slate-500 max-w-xs mt-0.5 mb-3">
+                  Referred patient cases and their live milestones will appear here.
+                </p>
+                <Link
+                  href="/sub-agent/submit-patient"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Submit Patient</span>
+                </Link>
               </div>
-            ))}
+            ) : (
+              recentCases.map((c, i) => (
+                <div
+                  key={i}
+                  className="py-3.5 flex items-center justify-between gap-4 hover:bg-teal-50/30 px-2 rounded-xl transition-colors"
+                >
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 font-bold text-xs flex items-center justify-center shrink-0 border border-teal-200">
+                      {c.initials}
+                    </div>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-bold text-slate-900 text-sm truncate">
+                          {c.name}
+                        </span>
+                        <span className="text-[11px] font-mono text-slate-400">
+                          {c.id}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-500 truncate mt-0.5">
+                        {c.treatment} • Destination: {c.country}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3 shrink-0">
+                    <span
+                      className={`text-[11px] font-bold px-2.5 py-1 rounded-full border ${c.statusBadge}`}
+                    >
+                      {c.status}
+                    </span>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
 

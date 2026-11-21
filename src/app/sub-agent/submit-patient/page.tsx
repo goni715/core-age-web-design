@@ -214,7 +214,7 @@ export default function SubAgentSubmitPatientPage() {
         <div>
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider bg-teal-50 text-teal-800 border border-teal-200">
-              Sub-Agent Referral Network
+              Referral Partner Network
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight mt-1">
@@ -679,7 +679,7 @@ export default function SubAgentSubmitPatientPage() {
           <Card className="p-5 bg-teal-50/80 rounded-2xl border border-teal-100 text-xs space-y-2 text-slate-700 shadow-2xs">
             <div className="flex items-center gap-1.5 text-teal-900 font-bold">
               <ShieldCheck className="w-4 h-4 text-teal-600" />
-              <span>Sub-Agent Workflow</span>
+              <span>Referral Partner Workflow</span>
             </div>
             <p className="leading-relaxed text-slate-600">
               1. <strong>Records Evaluation:</strong> 3S clinical board reviews documents within 24h.

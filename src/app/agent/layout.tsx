@@ -341,7 +341,7 @@ export default function AgentLayout({
                           </div>
                         )}
                         <span className="inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200/60">
-                          Agent (Master Partner)
+                          Channel Partner
                         </span>
                       </DropdownMenuLabel>
                     </DropdownMenuGroup>

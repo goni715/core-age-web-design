@@ -48,7 +48,7 @@ export default function SubAgentPatientsPage() {
   const [activeTab, setActiveTab] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("all");
-  const [selectedCaseId, setSelectedCaseId] = useState<string>("CS-2849");
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
 
   const { data: patientsResponse, isLoading } = useGetPatientsBySubAgentQuery({
     searchTerm: searchQuery,
@@ -184,70 +184,15 @@ export default function SubAgentPatientsPage() {
     }
   };
 
-  const samplePatients: IAgentPatientItem[] = [
-    {
-      _id: "sa-p1",
-      caseId: "CS-2849",
-      agentUserId: "ag1",
-      fullName: "Tariq Hasan",
-      phone: "+880 1712 345678",
-      treatmentType: "Coronary Angioplasty",
-      preferredCountry: "India",
-      status: "ongoing",
-      timeline: [
-        { title: "Case Submitted", date: "12 Oct 2026" },
-        { title: "Under Review by 3S Board", date: "14 Oct 2026" },
-        { title: "Apollo Hospital Confirmed", date: "18 Oct 2026" },
-        { title: "Patient Travel & Admission", date: "24 Oct 2026" },
-      ],
-      createdAt: "2026-10-12T10:00:00Z",
-    },
-    {
-      _id: "sa-p2",
-      caseId: "CS-2848",
-      agentUserId: "ag1",
-      fullName: "Ruma Begum",
-      phone: "+880 1819 876543",
-      treatmentType: "Knee Replacement Surgery",
-      preferredCountry: "Thailand",
-      status: "under_review",
-      timeline: [
-        { title: "Case Submitted", date: "20 Oct 2026" },
-        { title: "Under Review by Bumrungrad Desk", date: "22 Oct 2026" },
-      ],
-      createdAt: "2026-10-20T10:00:00Z",
-    },
-    {
-      _id: "sa-p3",
-      caseId: "CS-2841",
-      agentUserId: "ag1",
-      fullName: "Kamal Mustafa",
-      phone: "+880 1911 223344",
-      treatmentType: "Chemotherapy & Oncology",
-      preferredCountry: "Singapore",
-      status: "completed",
-      timeline: [
-        { title: "Case Submitted", date: "01 Sep 2026" },
-        { title: "Confirmed by Gleneagles", date: "05 Sep 2026" },
-        { title: "Treatment Completed", date: "28 Sep 2026" },
-        { title: "Referral Payout Released", date: "05 Oct 2026" },
-      ],
-      createdAt: "2026-09-01T10:00:00Z",
-    },
-  ];
-
-  const patientsList =
-    patientsResponse?.data && patientsResponse.data.length > 0
-      ? patientsResponse.data
-      : samplePatients;
+  const patientsList: IAgentPatientItem[] = patientsResponse?.data || [];
 
   const counts = patientsResponse?.statusCounts || {
-    all: patientsList.length,
-    submitted: 3,
-    under_review: 4,
-    confirmed: 2,
-    ongoing: 2,
-    completed: 12,
+    all: patientsResponse?.meta?.total ?? patientsList.length,
+    submitted: 0,
+    under_review: 0,
+    confirmed: 0,
+    ongoing: 0,
+    completed: 0,
     cancelled: 0,
   };
 
@@ -262,7 +207,8 @@ export default function SubAgentPatientsPage() {
 
   const selectedPatient =
     patientsList.find((p) => (p.caseId || p._id) === selectedCaseId) ||
-    patientsList[0];
+    patientsList[0] ||
+    null;
 
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
@@ -363,8 +309,23 @@ export default function SubAgentPatientsPage() {
                   </tr>
                 ) : patientsList.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-12 text-center text-slate-400">
-                      No cases found matching your search.
+                    <td colSpan={5} className="py-16 text-center">
+                      <div className="flex flex-col items-center justify-center max-w-sm mx-auto">
+                        <div className="w-12 h-12 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mb-3">
+                          <FileText className="w-6 h-6" />
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800 mb-1">No Referred Cases Yet</h4>
+                        <p className="text-xs text-slate-500 mb-4">
+                          You haven&apos;t referred any patients yet. Submit a patient case to track treatment progress and referral rewards.
+                        </p>
+                        <Link
+                          href="/sub-agent/submit-patient"
+                          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Submit Patient</span>
+                        </Link>
+                      </div>
                     </td>
                   </tr>
                 ) : (
@@ -413,7 +374,9 @@ export default function SubAgentPatientsPage() {
 
                         <td className="py-4 px-4 font-extrabold text-teal-800 text-sm">
                           {p.status === "completed"
-                            ? "$350 - $750"
+                            ? p.commissionAmount
+                              ? `TK ${Number(p.commissionAmount).toLocaleString()}`
+                              : "TK Earned"
                             : "Estimated on admission"}
                         </td>
 
@@ -445,112 +408,131 @@ export default function SubAgentPatientsPage() {
         </div>
 
         {/* Right Column: Selected Case Details & Progress */}
-        {selectedPatient && (() => {
-          const isFinal =
-            selectedPatient.status === "completed" ||
-            selectedPatient.status === "cancelled";
+        {selectedPatient ? (
+          (() => {
+            const isFinal =
+              selectedPatient.status === "completed" ||
+              selectedPatient.status === "cancelled";
 
-          return (
-            <div className="bg-white rounded-3xl border border-teal-100 shadow-2xs p-6 space-y-5">
-              <div className="flex items-start justify-between pb-4 border-b border-slate-100">
-                <div>
-                  <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/60">
-                    {selectedPatient.caseId || "CASE FILE"}
-                  </span>
-                  <h3 className="text-xl font-bold text-slate-900 mt-1.5">
-                    {selectedPatient.fullName}
-                  </h3>
-                  <p className="text-xs text-slate-500">
-                    {selectedPatient.phone || "No phone provided"}
-                  </p>
-                </div>
+            return (
+              <div className="bg-white rounded-3xl border border-teal-100 shadow-2xs p-6 space-y-5">
+                <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+                  <div>
+                    <span className="text-[10px] font-mono font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-md border border-teal-200/60">
+                      {selectedPatient.caseId || "CASE FILE"}
+                    </span>
+                    <h3 className="text-xl font-bold text-slate-900 mt-1.5">
+                      {selectedPatient.fullName}
+                    </h3>
+                    <p className="text-xs text-slate-500">
+                      {selectedPatient.phone || "No phone provided"}
+                    </p>
+                  </div>
 
-                <div className="flex items-center gap-2">
-                  {!isFinal && (
-                    <button
-                      type="button"
-                      onClick={() => handleOpenEdit(selectedPatient)}
-                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors cursor-pointer shadow-2xs"
-                      title="Edit patient details"
+                  <div className="flex items-center gap-2">
+                    {!isFinal && (
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEdit(selectedPatient)}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-xs font-bold text-teal-800 bg-teal-50 hover:bg-teal-100 border border-teal-200 transition-colors cursor-pointer shadow-2xs"
+                        title="Edit patient details"
+                      >
+                        <Edit3 className="w-3.5 h-3.5" />
+                        <span>Edit</span>
+                      </button>
+                    )}
+                    <span
+                      className={`text-xs font-bold px-2.5 py-1 rounded-full border ${getStatusBadge(
+                        selectedPatient.status
+                      )}`}
                     >
-                      <Edit3 className="w-3.5 h-3.5" />
-                      <span>Edit</span>
-                    </button>
-                  )}
-                  <span
-                    className={`text-xs font-bold px-2.5 py-1 rounded-full border ${getStatusBadge(
-                      selectedPatient.status
-                    )}`}
-                  >
-                    {selectedPatient.status}
-                  </span>
+                      {selectedPatient.status}
+                    </span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Case Meta Box */}
-              <div className="bg-teal-50/50 rounded-2xl p-4 text-xs space-y-2.5 border border-teal-100">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Treatment:</span>
-                  <span className="font-bold text-slate-800">
-                    {selectedPatient.treatmentType}
-                  </span>
+                {/* Case Meta Box */}
+                <div className="bg-teal-50/50 rounded-2xl p-4 text-xs space-y-2.5 border border-teal-100">
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Treatment:</span>
+                    <span className="font-bold text-slate-800">
+                      {selectedPatient.treatmentType}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Destination:</span>
+                    <span className="font-semibold text-slate-800">
+                      {selectedPatient.preferredCountry || "India"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-500">Medical Coordinator:</span>
+                    <span className="font-semibold text-teal-800">
+                      3S Care Desk
+                    </span>
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Destination:</span>
-                  <span className="font-semibold text-slate-800">
-                    {selectedPatient.preferredCountry || "India"}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Medical Coordinator:</span>
-                  <span className="font-semibold text-teal-800">
-                    3S Care Desk
-                  </span>
-                </div>
-              </div>
 
-              {/* Treatment Milestones Timeline */}
-              <div>
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
-                  Treatment Milestones
-                </h4>
-                <div className="space-y-3">
-                  {Array.isArray(selectedPatient.timeline) && selectedPatient.timeline.length > 0 ? (
-                    selectedPatient.timeline.map((step: { title: string; date: string }, idx: number) => (
-                      <div key={idx} className="flex items-start gap-3 text-xs">
-                        <div className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5">
-                          <Check className="w-3 h-3" />
+                {/* Treatment Milestones Timeline */}
+                <div>
+                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">
+                    Treatment Milestones
+                  </h4>
+                  <div className="space-y-3">
+                    {Array.isArray(selectedPatient.timeline) && selectedPatient.timeline.length > 0 ? (
+                      selectedPatient.timeline.map((step: { title: string; date: string }, idx: number) => (
+                        <div key={idx} className="flex items-start gap-3 text-xs">
+                          <div className="w-5 h-5 rounded-full bg-teal-600 text-white flex items-center justify-center shrink-0 text-[10px] font-bold mt-0.5">
+                            <Check className="w-3 h-3" />
+                          </div>
+                          <div className="flex-1 flex justify-between">
+                            <span className="font-semibold text-slate-800">
+                              {step.title}
+                            </span>
+                            <span className="text-slate-400 font-mono text-[11px]">
+                              {step.date}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex-1 flex justify-between">
-                          <span className="font-semibold text-slate-800">
-                            {step.title}
-                          </span>
-                          <span className="text-slate-400 font-mono text-[11px]">
-                            {step.date}
-                          </span>
-                        </div>
+                      ))
+                    ) : (
+                      <div className="text-xs text-slate-400">
+                        Case submitted to 3S international medical board.
                       </div>
-                    ))
-                  ) : (
-                    <div className="text-xs text-slate-400">
-                      Case submitted to 3S international medical board.
-                    </div>
-                  )}
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href={`/sub-agent/submit-patient`}
+                    className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold text-xs transition-colors"
+                  >
+                    <FileText className="w-3.5 h-3.5" />
+                    <span>Submit Another Patient Case</span>
+                  </Link>
                 </div>
               </div>
-
-              <div className="pt-2">
-                <Link
-                  href={`/sub-agent/submit-patient`}
-                  className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-800 font-semibold text-xs transition-colors"
-                >
-                  <FileText className="w-3.5 h-3.5" />
-                  <span>Submit Another Patient Case</span>
-                </Link>
-              </div>
+            );
+          })()
+        ) : (
+          <div className="bg-white rounded-3xl border border-teal-100 shadow-2xs p-8 text-center flex flex-col items-center justify-center min-h-[320px]">
+            <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-3">
+              <FileText className="w-7 h-7" />
             </div>
-          );
-        })()}
+            <h3 className="text-base font-bold text-slate-800">No Case Selected</h3>
+            <p className="text-xs text-slate-500 max-w-[220px] mt-1 mb-4">
+              Submit your patient cases to track medical milestones and referral earnings in real time.
+            </p>
+            <Link
+              href="/sub-agent/submit-patient"
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Submit Patient</span>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Edit Patient Pop-up Modal */}
@@ -568,7 +550,7 @@ export default function SubAgentPatientsPage() {
                     Edit Patient Details
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Case {editModalPatient.caseId || "CS-" + editModalPatient._id.slice(-4)} &bull; Sub-Agent Referral
+                    Case {editModalPatient.caseId || "CS-" + editModalPatient._id.slice(-4)} &bull; Referral Partner Referral
                   </p>
                 </div>
               </div>

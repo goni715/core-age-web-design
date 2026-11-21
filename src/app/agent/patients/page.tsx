@@ -7,6 +7,7 @@ import {
   ChevronDown,
   Check,
   UserPlus,
+  Plus,
   Loader2,
   FileText,
   Lock,
@@ -54,7 +55,7 @@ export default function AgentPatientsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedPartnerId, setSelectedPartnerId] = useState("all");
   const [selectedCountry, setSelectedCountry] = useState("all");
-  const [selectedCaseId, setSelectedCaseId] = useState<string>("CS-2847");
+  const [selectedCaseId, setSelectedCaseId] = useState<string | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
     isOpen: boolean;
@@ -202,108 +203,15 @@ export default function AgentPatientsPage() {
     }
   };
 
-  const samplePatients: IAgentPatientItem[] = [
-    {
-      _id: "p1",
-      caseId: "CS-2847",
-      agentUserId: "ag1",
-      fullName: "John Smith",
-      phone: "+1 (555) 123-4567",
-      treatmentType: "Cardiac surgery",
-      preferredCountry: "India",
-      subAgent: {
-        _id: "sa1",
-        refCode: "RP-0112",
-        fullName: "Nusrat Jahan",
-        email: "nusrat@example.com",
-        agencyName: "Dhaka Health Care",
-      },
-      status: "ongoing",
-      timeline: [
-        { title: "Submitted", date: "02 Sep 2026" },
-        { title: "Under review", date: "04 Sep 2026" },
-        { title: "Confirmed", date: "09 Sep 2026" },
-        { title: "Ongoing", date: "28 Sep 2026" },
-      ],
-      createdAt: "2026-09-02T10:00:00Z",
-    },
-    {
-      _id: "p2",
-      caseId: "CS-2846",
-      agentUserId: "ag1",
-      fullName: "Sarah Johnson",
-      phone: "+1 (555) 987-6543",
-      treatmentType: "Orthopedic surgery",
-      preferredCountry: "Thailand",
-      subAgent: {
-        _id: "sa2",
-        refCode: "RP-0115",
-        fullName: "Imran Hossain",
-        email: "imran@example.com",
-        agencyName: "Sylhet Med Care",
-      },
-      status: "under_review",
-      timeline: [
-        { title: "Submitted", date: "01 Sep 2026" },
-        { title: "Under review", date: "04 Sep 2026" },
-      ],
-      createdAt: "2026-09-01T10:00:00Z",
-    },
-    {
-      _id: "p3",
-      caseId: "CS-2845",
-      agentUserId: "ag1",
-      fullName: "Michael Brown",
-      phone: "+1 (555) 456-7890",
-      treatmentType: "Cancer treatment",
-      preferredCountry: "Singapore",
-      subAgent: null,
-      status: "confirmed",
-      timeline: [
-        { title: "Submitted", date: "28 Aug 2026" },
-        { title: "Under review", date: "31 Aug 2026" },
-        { title: "Confirmed", date: "05 Sep 2026" },
-      ],
-      createdAt: "2026-08-28T10:00:00Z",
-    },
-    {
-      _id: "p4",
-      caseId: "CS-2844",
-      agentUserId: "ag1",
-      fullName: "Emily Davis",
-      phone: "+1 (555) 321-6549",
-      treatmentType: "Dental implants",
-      preferredCountry: "Malaysia",
-      subAgent: {
-        _id: "sa3",
-        refCode: "RP-0120",
-        fullName: "Farhana Akter",
-        email: "farhana@example.com",
-      },
-      status: "completed",
-      timeline: [
-        { title: "Submitted", date: "10 Aug 2026" },
-        { title: "Under review", date: "12 Aug 2026" },
-        { title: "Confirmed", date: "15 Aug 2026" },
-        { title: "Ongoing", date: "20 Aug 2026" },
-        { title: "Completed", date: "01 Sep 2026" },
-      ],
-      createdAt: "2026-08-10T10:00:00Z",
-    },
-  ];
-
-  const patientsList =
-    patientsResponse?.data && patientsResponse.data.length > 0
-      ? patientsResponse.data
-      : samplePatients;
+  const patientsList: IAgentPatientItem[] = patientsResponse?.data || [];
 
   const counts = patientsResponse?.statusCounts || {
-    all: patientsList.length,
-    submitted: 24,
-    under_review: 31,
-    confirmed: 22,
-    ongoing: 41,
-    completed: 268,
+    all: patientsResponse?.meta?.total ?? patientsList.length,
+    submitted: 0,
+    under_review: 0,
+    confirmed: 0,
+    ongoing: 0,
+    completed: 0,
     cancelled: 0,
   };
 
@@ -319,7 +227,8 @@ export default function AgentPatientsPage() {
 
   const selectedPatient =
     patientsList.find((p) => (p.caseId || p._id) === selectedCaseId) ||
-    patientsList[0];
+    patientsList[0] ||
+    null;
 
   const handleStatusSelectChange = (newStatus: string) => {
     if (!selectedPatient || newStatus === selectedPatient.status) return;
@@ -665,7 +574,8 @@ export default function AgentPatientsPage() {
         </div>
 
         {/* Right Column: Selected Case Details & Progress */}
-        {selectedPatient && (() => {
+        {selectedPatient ? (
+          (() => {
           const isFinalized =
             selectedPatient.status === "completed" ||
             selectedPatient.status === "cancelled";
@@ -734,15 +644,15 @@ export default function AgentPatientsPage() {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Channel Partner</span>
+                  <span className="text-slate-500">Referral Partner</span>
                   <span className="font-bold text-slate-900">
-                    {selectedPatient.subAgent?.agencyName || "You"}
+                    {selectedPatient.subAgent?.agencyName || "Direct"}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Onboarding path</span>
                   <span className="font-bold text-slate-900">
-                    {selectedPatient.subAgentId ? "Via Channel Partner" : "Direct Onboarding"}
+                    {selectedPatient.subAgentId ? "Via Referral Partner" : "Direct Onboarding"}
                   </span>
                 </div>
               </div>
@@ -877,9 +787,11 @@ export default function AgentPatientsPage() {
                   </span>
                   <span className="text-sm font-bold text-slate-900 block mt-0.5">
                     {selectedPatient.status === "completed"
-                      ? "Approved ($450)"
+                      ? selectedPatient.commissionAmount
+                        ? `Approved (TK ${Number(selectedPatient.commissionAmount).toLocaleString()})`
+                        : "Approved"
                       : selectedPatient.status === "cancelled"
-                      ? "Cancelled ($0)"
+                      ? "Cancelled (TK 0)"
                       : "Pending approval"}
                   </span>
                 </div>
@@ -888,12 +800,30 @@ export default function AgentPatientsPage() {
                   href={`/agent/submit-patient`}
                   className="border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold text-xs py-2 px-3.5 rounded-xl transition-colors shrink-0 shadow-2xs"
                 >
-                  View details
+                  Submit New Case
                 </Link>
               </div>
             </div>
           );
-        })()}
+        })()
+      ) : (
+        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-2xs p-8 text-center flex flex-col items-center justify-center min-h-[320px]">
+          <div className="w-14 h-14 rounded-2xl bg-blue-50 text-[#0062c4] flex items-center justify-center mx-auto mb-3">
+            <FileText className="w-7 h-7" />
+          </div>
+          <h3 className="text-base font-bold text-slate-800">No Patient Selected</h3>
+          <p className="text-xs text-slate-500 max-w-[220px] mt-1 mb-4">
+            Patient cases submitted directly or via your Referral Partner network will appear here.
+          </p>
+          <Link
+            href="/agent/submit-patient"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#0062c4] hover:bg-blue-700 text-white text-xs font-bold transition-colors shadow-2xs cursor-pointer"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>Submit Patient</span>
+          </Link>
+        </div>
+      )}
       </div>
 
       {/* Confirmation Modal for Finalizing Case (Completed / Cancelled) */}
@@ -969,7 +899,7 @@ export default function AgentPatientsPage() {
         </div>
       )}
 
-      {/* Edit Patient Pop-up Modal (Only for direct patients without sub-agent) */}
+      {/* Edit Patient Pop-up Modal (Only for direct patients without referral partner) */}
       {editModalPatient && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-100 flex flex-col max-h-[85vh] overflow-hidden">

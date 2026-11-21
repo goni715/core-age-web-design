@@ -639,7 +639,7 @@ export default function AgentSubmitPatientPage() {
                 className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white"
               >
                 <option value="direct">
-                  Direct Agency Case (No Sub-Agent)
+                  Direct Agency Case (No Referral Partner)
                 </option>
                 {networkData?.data?.map((partner) => (
                   <option key={partner._id} value={partner._id}>
@@ -648,7 +648,7 @@ export default function AgentSubmitPatientPage() {
                 ))}
               </select>
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                If this case was referred through one of your sub-agents, select them to automatically record their referral commission.
+                If this case was referred through one of your referral partners, select them to automatically record their referral commission.
               </p>
             </div>
 

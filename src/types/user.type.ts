@@ -53,6 +53,7 @@ export interface ISubAgentProfileData {
   agentName?: string;
   agentEmail?: string;
   agentPhone?: string;
+  totalEarnings?: number | string;
   lastLoginAt?: string;
   createdAt?: string;
   updatedAt?: string;

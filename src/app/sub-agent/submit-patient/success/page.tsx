@@ -15,7 +15,7 @@ export default function SubAgentSubmitPatientSuccessPage() {
       <div className="space-y-2">
         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200">
           <Sparkles className="w-3.5 h-3.5" />
-          Sub-Agent Case Recorded
+          Referral Partner Case Recorded
         </span>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
           Patient Case is Under Review

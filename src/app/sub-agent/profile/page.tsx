@@ -123,7 +123,7 @@ export default function SubAgentProfilePage() {
           </Card>
           <Card className="md:col-span-2 p-8 bg-white rounded-3xl border border-teal-100 shadow-2xs flex flex-col items-center justify-center min-h-[360px] space-y-4">
             <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
-            <p className="text-sm font-medium text-slate-500">Fetching sub-agent details...</p>
+            <p className="text-sm font-medium text-slate-500">Fetching referral partner details...</p>
           </Card>
         </div>
       ) : isError || !profile ? (
@@ -172,7 +172,7 @@ export default function SubAgentProfilePage() {
                 </p>
                 <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-200/70">
                   <ShieldCheck className="w-3.5 h-3.5 text-teal-700" />
-                  <span>Referral Partner (Sub-Agent)</span>
+                  <span>Referral Partner</span>
                 </div>
               </div>
 
@@ -188,7 +188,7 @@ export default function SubAgentProfilePage() {
               <div className="pt-4 border-t border-slate-100 text-xs text-left space-y-3 text-slate-600">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Partner Role:</span>
-                  <span className="font-bold text-teal-800">Sub-Agent</span>
+                  <span className="font-bold text-teal-800">Referral Partner</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Supervised By:</span>
@@ -363,7 +363,7 @@ export default function SubAgentProfilePage() {
                   </div>
                 </div>
                 <span className="font-bold text-xs text-blue-700 bg-blue-50 border border-blue-200/70 px-2.5 py-1 rounded-lg">
-                  Master Agent
+                  Channel Partner
                 </span>
               </div>
 

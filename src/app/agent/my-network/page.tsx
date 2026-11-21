@@ -208,7 +208,7 @@ export default function AgentMyNetworkPage() {
               referralPartnersCount
             )}
           </div>
-          <div className="text-xs text-slate-500 mt-1">Total onboarded sub-agents</div>
+          <div className="text-xs text-slate-500 mt-1">Total onboarded referral partners</div>
         </Card>
 
         <Card className="p-5 border border-slate-200/80 bg-white rounded-2xl shadow-2xs">

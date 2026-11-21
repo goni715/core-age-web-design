@@ -23,6 +23,17 @@ import { SuccessToast, ErrorToast } from "@/helpers/ValidationHelper";
 
 export default function SubAgentSupportPage() {
   const [newTicketModal, setNewTicketModal] = useState(false);
+  const [selectedTicket, setSelectedTicket] = useState<{
+    id: string;
+    ticketNumber: string;
+    subject: string;
+    message: string;
+    replyMessage: string;
+    replyAt: string | null;
+    status: string;
+    category: string;
+    updatedAt: string;
+  } | null>(null);
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<{ subject?: string; message?: string }>({});
@@ -47,19 +58,36 @@ export default function SubAgentSupportPage() {
     useGetSubAgentSupportsQuery(undefined);
 
   const rawTickets = supportsData?.data || [];
-  const tickets = rawTickets.map((t, idx) => ({
-    id: t.id || t._id ? `TK-${(t.id || t._id || "").slice(-4).toUpperCase()}` : `TK-${4200 + idx}`,
-    subject: t.subject || "General Inquiry",
-    status: t.status === "resolved" ? "Resolved" : t.status === "in-progress" ? "In Progress" : "Open",
-    category: "Referral Support",
-    updatedAt: t.createdAt
-      ? new Date(t.createdAt).toLocaleDateString("en-US", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        })
-      : "Recently",
-  }));
+  const tickets = rawTickets.map((t, idx) => {
+    const ticketId = t.ticket
+      ? (String(t.ticket).startsWith("TK-") ? String(t.ticket) : `TK-${t.ticket}`)
+      : t.id || t._id
+      ? `TK-${(t.id || t._id || "").slice(-4).toUpperCase()}`
+      : `TK-${4200 + idx}`;
+
+    return {
+      id: ticketId,
+      ticketNumber: t.ticket || "",
+      subject: t.subject || "General Inquiry",
+      message: t.message || "",
+      replyMessage: t.replyMessage || "",
+      replyAt: t.replyAt || null,
+      status:
+        t.status?.toLowerCase() === "resolved"
+          ? "Resolved"
+          : t.status?.toLowerCase() === "in-progress"
+          ? "In Progress"
+          : "Open",
+      category: "Referral Support",
+      updatedAt: t.createdAt
+        ? new Date(t.createdAt).toLocaleDateString("en-US", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          })
+        : "Recently",
+    };
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,7 +136,7 @@ export default function SubAgentSupportPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">
-            Sub-Agent Support & Coordination
+            Referral Partner Support & Coordination
           </h1>
           <p className="text-slate-500 text-sm">
             Reach out for medical quotation status, patient travel logistics, or referral earnings queries
@@ -172,7 +200,8 @@ export default function SubAgentSupportPage() {
             {tickets.map((t) => (
               <div
                 key={t.id}
-                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-teal-50/40 transition-colors"
+                onClick={() => setSelectedTicket(t)}
+                className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-teal-50/40 transition-colors cursor-pointer"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
@@ -206,6 +235,102 @@ export default function SubAgentSupportPage() {
           </div>
         )}
       </Card>
+
+      {/* Ticket Details Modal */}
+      {selectedTicket && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center p-4 transition-all animate-in fade-in"
+          onClick={() => setSelectedTicket(null)}
+        >
+          <div
+            className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-teal-100 space-y-5 relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-start justify-between gap-4 pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-3">
+                <span className="text-sm font-mono font-extrabold text-teal-700 bg-teal-50 px-3 py-1 rounded-lg border border-teal-100">
+                  {selectedTicket.id}
+                </span>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base sm:text-lg">
+                    {selectedTicket.subject}
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Submitted: {selectedTicket.updatedAt}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setSelectedTicket(null)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Status & Category */}
+            <div className="flex items-center justify-between text-xs p-3 bg-slate-50 rounded-2xl">
+              <span className="text-slate-500 font-medium">
+                Category: <strong className="text-slate-700">{selectedTicket.category}</strong>
+              </span>
+              <span
+                className={`font-bold px-2.5 py-0.5 rounded-full ${
+                  selectedTicket.status === "Resolved"
+                    ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                    : "bg-teal-50 text-teal-700 border border-teal-200"
+                }`}
+              >
+                {selectedTicket.status}
+              </span>
+            </div>
+
+            {/* Submitted Message */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 block">
+                Your Inquiry Message
+              </label>
+              <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100 text-xs sm:text-sm text-slate-800 whitespace-pre-wrap leading-relaxed">
+                {selectedTicket.message || "No detailed message provided."}
+              </div>
+            </div>
+
+            {/* Support Team Reply */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold text-slate-700 block">
+                Support Team Response
+              </label>
+              {selectedTicket.replyMessage ? (
+                <div className="p-3.5 bg-teal-50/70 rounded-2xl border border-teal-100 text-xs sm:text-sm text-teal-950 whitespace-pre-wrap leading-relaxed">
+                  {selectedTicket.replyMessage}
+                  {selectedTicket.replyAt && (
+                    <div className="mt-2 text-[11px] text-teal-600 font-medium">
+                      Replied at: {new Date(selectedTicket.replyAt).toLocaleString("en-US")}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="p-3.5 bg-amber-50/60 rounded-2xl border border-amber-100 text-xs text-amber-800">
+                  Our clinical coordinators are reviewing your ticket. You will receive an update here soon.
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="pt-2 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setSelectedTicket(null)}
+                className="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pop-up Modal for New Support Request */}
       {newTicketModal && (

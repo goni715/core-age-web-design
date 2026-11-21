@@ -12,7 +12,7 @@ export default function SubAgentRootPage() {
 
   return (
     <div className="py-20 text-center text-sm text-slate-400">
-      Loading sub-agent portal...
+      Loading Referral Partner portal...
     </div>
   );
 }

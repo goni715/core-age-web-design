@@ -21,3 +21,30 @@ export interface IDashboardStatsResponse {
   message: string;
   data: IDashboardStats;
 }
+
+export interface ISubAgentDashboardBreakdown {
+  all?: number;
+  submitted?: number;
+  underReview?: number;
+  confirmed?: number;
+  ongoing?: number;
+  completed?: number;
+  cancelled?: number;
+  [key: string]: number | undefined;
+}
+
+export interface ISubAgentDashboardStats {
+  myTotalCases: number;
+  ongoingTreatment: number;
+  completedCases: number;
+  myReferralEarnings: number;
+  currency?: string;
+  breakdown?: ISubAgentDashboardBreakdown;
+}
+
+export interface ISubAgentDashboardStatsResponse {
+  statusCode?: number;
+  success: boolean;
+  message: string;
+  data: ISubAgentDashboardStats;
+}

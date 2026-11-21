@@ -44,6 +44,7 @@ export interface IAgentPatientItem {
   symptoms?: string;
   preferredCountry?: string;
   budgetRange?: string;
+  commissionAmount?: number | string;
   reports?: string[];
   driveLink?: string;
   status: "submitted" | "under_review" | "confirmed" | "ongoing" | "completed" | "cancelled" | string;
@@ -231,7 +232,7 @@ export const agentPatientApi = apiSlice.injectEndpoints({
         method: "POST",
         body,
       }),
-      invalidatesTags: [TagTypes.PATIENT_CASES],
+      invalidatesTags: [TagTypes.PATIENT_CASES, TagTypes.DASHBOARD],
     }),
 
     getPatientById: builder.query<{ success: boolean; data: IAgentPatientItem }, string>({
@@ -277,11 +278,11 @@ export const agentPatientApi = apiSlice.injectEndpoints({
       }
     >({
       query: ({ patientId, data }) => ({
-        url: `/agent-patient/update-patient/by-agent/${patientId}`,
+        url: `/agent-patient/update-patient/by-sub-agent/${patientId}`,
         method: "PATCH",
         body: data,
       }),
-      invalidatesTags: [TagTypes.PATIENT_CASES],
+      invalidatesTags: [TagTypes.PATIENT_CASES, TagTypes.DASHBOARD],
     }),
 
     getCommissionStatsByAgent: builder.query<

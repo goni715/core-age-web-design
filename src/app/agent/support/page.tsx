@@ -49,7 +49,11 @@ export default function AgentSupportPage() {
 
   const rawTickets = supportsData?.data || [];
   const tickets = rawTickets.map((t, idx) => ({
-    id: t.id || t._id ? `TK-${(t.id || t._id || "").slice(-4).toUpperCase()}` : `TK-${4100 + idx}`,
+    id: t.ticket
+      ? (String(t.ticket).startsWith("TK-") ? String(t.ticket) : `TK-${t.ticket}`)
+      : t.id || t._id
+      ? `TK-${(t.id || t._id || "").slice(-4).toUpperCase()}`
+      : `TK-${4100 + idx}`,
     subject: t.subject || "General Inquiry",
     status: t.status === "resolved" ? "Resolved" : t.status === "in-progress" ? "In Progress" : "Open",
     priority: t.priority ? t.priority.charAt(0).toUpperCase() + t.priority.slice(1) : "Normal",
