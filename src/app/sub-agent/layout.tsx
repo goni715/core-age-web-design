@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import {
   Menu,
@@ -151,19 +152,15 @@ export default function SubAgentLayout({
           {/* Brand / Logo */}
           <div className="h-20 flex items-center justify-between px-6 shrink-0 border-b border-white/10">
             <Link href="/sub-agent/dashboard" className="flex items-center gap-3 group">
-              <div
-                style={{ background: "linear-gradient(135deg, #34d399, #99f6e4)" }}
-                className="w-9 h-9 rounded-xl text-[#073834] flex items-center justify-center font-black text-sm tracking-tight shadow-xs transition-transform group-hover:scale-105"
-              >
-                3S
-              </div>
-              <div>
-                <span className="font-bold text-white text-sm block leading-tight tracking-tight">
-                  3S Medi Care Int
-                </span>
-                <span className="text-[11px] text-teal-200/90 font-normal block leading-tight mt-0.5">
-                  Referral Partner Portal
-                </span>
+              <div className="bg-white px-2.5 py-1.5 rounded-xl flex items-center shadow-xs transition-transform group-hover:scale-105">
+                <Image
+                  src="/logo.png"
+                  alt="3S Medi Care International"
+                  width={147}
+                  height={40}
+                  className="h-8 sm:h-9 w-auto object-contain"
+                  priority
+                />
               </div>
             </Link>
             <Button

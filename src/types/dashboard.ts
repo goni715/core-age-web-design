@@ -48,3 +48,48 @@ export interface ISubAgentDashboardStatsResponse {
   message: string;
   data: ISubAgentDashboardStats;
 }
+
+export interface IAgentDashboardStats {
+  totalPatients: number;
+  referralPartners: number;
+  ongoingCases: number;
+  completed: number;
+  completedCases?: number;
+  networkEarnings: number;
+  totalEarnings?: number;
+  currency?: string;
+  [key: string]: any;
+}
+
+export interface IAgentDashboardStatsResponse {
+  statusCode?: number;
+  success: boolean;
+  message: string;
+  data: IAgentDashboardStats;
+}
+
+export interface IAgentMonthlyReferralItem {
+  month: string;
+  monthNumber: number;
+  referrals: number;
+  cases: number;
+  count: number;
+  [key: string]: any;
+}
+
+export interface IAgentMonthlyReferralsData {
+  year: number;
+  totalReferrals: number;
+  totalCases: number;
+  averageCasesPerMonth: number;
+  averageCasesPerMonthFormatted: string;
+  monthlyData: IAgentMonthlyReferralItem[];
+  [key: string]: any;
+}
+
+export interface IAgentMonthlyReferralsResponse {
+  statusCode?: number;
+  success: boolean;
+  message: string;
+  data: IAgentMonthlyReferralsData;
+}

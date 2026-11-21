@@ -44,6 +44,8 @@ export interface IAgentPatientItem {
   symptoms?: string;
   preferredCountry?: string;
   budgetRange?: string;
+  documentSource?: "google_drive" | "whatsapp" | string;
+  link?: string;
   commissionAmount?: number | string;
   reports?: string[];
   driveLink?: string;
@@ -164,6 +166,8 @@ export interface ISubmitPatientPayload {
   symptoms?: string;
   preferredCountry?: string;
   budgetRange?: string;
+  documentSource?: "google_drive" | "whatsapp" | string;
+  link?: string;
   subAgentId?: string;
   driveLink?: string;
   reports?: File[] | string[];

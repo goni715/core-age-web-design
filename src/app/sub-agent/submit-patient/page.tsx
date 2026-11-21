@@ -16,12 +16,15 @@ import {
   Sparkles,
   ShieldCheck,
   FileCheck,
+  MessageSquare,
 } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useSubmitPatientBySubAgentMutation } from "@/redux/features/agentPatient/agentPatientApi";
 import { SuccessToast, ErrorToast } from "@/helpers/ValidationHelper";
 
 const TREATMENT_CATEGORIES = [
+  "Normal",
+  "Normal / General Treatment",
   "Cardiac Surgery & Cardiology",
   "Orthopedic & Joint Replacement",
   "Oncology & Cancer Care",
@@ -35,6 +38,7 @@ const TREATMENT_CATEGORIES = [
 ];
 
 const DESTINATION_COUNTRIES = [
+  { name: "China", hospitals: "Peking Union, Fudan Univ Hospital" },
   { name: "India", hospitals: "Apollo, Fortis, Max, Medanta" },
   { name: "Thailand", hospitals: "Bumrungrad, Bangkok Hospital" },
   { name: "Singapore", hospitals: "Mount Elizabeth, Gleneagles" },
@@ -44,6 +48,7 @@ const DESTINATION_COUNTRIES = [
 ];
 
 const BUDGET_PRESETS = [
+  "5-10 thousands",
   "Under $2,000",
   "$2,000 - $5,000",
   "$5,000 - $10,000",
@@ -61,11 +66,12 @@ export default function SubAgentSubmitPatientPage() {
     phone: "",
     age: "",
     gender: "male", // must be lowercase: "male" | "female" | "other"
-    treatmentType: TREATMENT_CATEGORIES[0],
-    preferredCountry: "India",
-    budgetRange: "$3,000 - $8,000",
+    treatmentType: "Normal",
+    preferredCountry: "China",
+    budgetRange: "5-10 thousands",
     symptoms: "",
-    driveLink: "",
+    documentSource: "google_drive" as "google_drive" | "whatsapp",
+    link: "",
   });
 
   const [customBudget, setCustomBudget] = useState(false);
@@ -130,16 +136,13 @@ export default function SubAgentSubmitPatientPage() {
 
     if (!formData.symptoms.trim()) {
       newErrors.symptoms = "Symptoms & clinical details are required";
-    } else if (formData.symptoms.trim().length < 5) {
-      newErrors.symptoms = "Please provide more details about the symptoms (min 5 characters)";
     }
 
-    if (formData.driveLink.trim()) {
-      try {
-        new URL(formData.driveLink.trim());
-      } catch {
-        newErrors.driveLink = "Please enter a valid URL (e.g. https://drive.google.com/...)";
-      }
+    if (!formData.link.trim()) {
+      newErrors.link =
+        formData.documentSource === "google_drive"
+          ? "Google Drive link is required (e.g. https://drive.google.com/...)"
+          : "WhatsApp link or contact number is required";
     }
 
     setErrors(newErrors);
@@ -162,24 +165,23 @@ export default function SubAgentSubmitPatientPage() {
         age: number;
         gender: string;
         treatmentType: string;
+        symptoms: string;
         preferredCountry: string;
         budgetRange: string;
-        symptoms: string;
-        driveLink?: string;
+        documentSource: "google_drive" | "whatsapp";
+        link: string;
       } = {
         fullName: formData.fullName.trim(),
         phone: cleanPhone,
         age: Math.floor(Number(formData.age)),
         gender: formData.gender.toLowerCase(),
         treatmentType: formData.treatmentType.trim(),
+        symptoms: formData.symptoms.trim(),
         preferredCountry: formData.preferredCountry.trim(),
         budgetRange: formData.budgetRange.trim(),
-        symptoms: formData.symptoms.trim(),
+        documentSource: formData.documentSource,
+        link: formData.link.trim(),
       };
-
-      if (formData.driveLink.trim()) {
-        payload.driveLink = formData.driveLink.trim();
-      }
 
       await submitPatient(payload).unwrap();
       SuccessToast("Patient case submitted successfully!");
@@ -205,7 +207,7 @@ export default function SubAgentSubmitPatientPage() {
       formData.budgetRange.trim() &&
       formData.symptoms.trim().length >= 5
   );
-  const isDriveLinkProvided = Boolean(formData.driveLink.trim());
+  const isLinkProvided = Boolean(formData.link.trim());
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 pb-12">
@@ -532,7 +534,7 @@ export default function SubAgentSubmitPatientPage() {
             </div>
           </Card>
 
-          {/* Section 3: Diagnostic Reports / Drive Link */}
+          {/* Section 3: Diagnostic Reports & Documents Source */}
           <Card className="p-6 md:p-7 bg-white rounded-3xl border border-teal-100 shadow-2xs space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
@@ -541,41 +543,116 @@ export default function SubAgentSubmitPatientPage() {
                 </div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-base">
-                    Medical Reports & Documents (Google Drive Link)
+                    Medical Reports & Documents Source
                   </h3>
                   <p className="text-xs text-slate-400">
-                    Provide a Google Drive or cloud storage link for medical documents
+                    Choose document source and provide link for clinical review
                   </p>
                 </div>
               </div>
             </div>
 
+            {/* Document Source Selector: Google Drive vs WhatsApp */}
             <div className="space-y-2">
+              <label className="text-xs font-bold text-slate-700">
+                Document Source <span className="text-rose-500">*</span>
+              </label>
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, documentSource: "google_drive" }))}
+                  className={`p-3.5 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
+                    formData.documentSource === "google_drive"
+                      ? "bg-teal-50/80 border-teal-600 ring-2 ring-teal-600/20 shadow-xs"
+                      : "bg-white border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                      formData.documentSource === "google_drive"
+                        ? "bg-teal-600 text-white"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    <LinkIcon className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900">Google Drive</div>
+                    <div className="text-[11px] text-slate-500">Cloud folder link</div>
+                  </div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, documentSource: "whatsapp" }))}
+                  className={`p-3.5 rounded-2xl border flex items-center gap-3 transition-all cursor-pointer text-left ${
+                    formData.documentSource === "whatsapp"
+                      ? "bg-emerald-50/80 border-emerald-600 ring-2 ring-emerald-600/20 shadow-xs"
+                      : "bg-white border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  <div
+                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
+                      formData.documentSource === "whatsapp"
+                        ? "bg-emerald-600 text-white"
+                        : "bg-slate-100 text-slate-500"
+                    }`}
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-slate-900">WhatsApp</div>
+                    <div className="text-[11px] text-slate-500">Direct chat / contact</div>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Link Input */}
+            <div className="space-y-1.5 pt-1">
               <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
                 <span className="flex items-center gap-1.5">
                   <LinkIcon className="w-3.5 h-3.5 text-teal-600" />
-                  <span>Google Drive Link</span>
+                  <span>
+                    {formData.documentSource === "google_drive"
+                      ? "Google Drive Link"
+                      : "WhatsApp Link / Number"}{" "}
+                    <span className="text-rose-500">*</span>
+                  </span>
                 </span>
-                {errors.driveLink && (
+                {errors.link && (
                   <span className="text-rose-500 text-[11px] font-normal">
-                    {errors.driveLink}
+                    {errors.link}
                   </span>
                 )}
               </label>
               <input
-                type="url"
-                name="driveLink"
-                value={formData.driveLink}
+                type="text"
+                name="link"
+                value={formData.link}
                 onChange={handleInputChange}
-                placeholder="https://drive.google.com/drive/folders/..."
+                placeholder={
+                  formData.documentSource === "google_drive"
+                    ? "https://drive.google.com/..."
+                    : "https://wa.me/8801700000000 or 01700000000"
+                }
                 className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
-                  errors.driveLink
+                  errors.link
                     ? "border-rose-300 focus:ring-rose-500/20 focus:border-rose-500 bg-rose-50/20"
                     : "border-slate-200 focus:ring-teal-500/20 focus:border-teal-500"
                 }`}
               />
               <p className="text-[11px] text-slate-400 leading-relaxed">
-                Make sure the Drive link permissions are set to <strong>&quot;Anyone with the link can view&quot;</strong> so our medical review team can access the files.
+                {formData.documentSource === "google_drive" ? (
+                  <>
+                    Make sure the Drive link permissions are set to{" "}
+                    <strong>&quot;Anyone with the link can view&quot;</strong> so our medical review team can access the files.
+                  </>
+                ) : (
+                  <>
+                    Provide a WhatsApp invite link or contact number so our clinical review desk can coordinate and receive medical reports.
+                  </>
+                )}
               </p>
             </div>
           </Card>
@@ -665,11 +742,11 @@ export default function SubAgentSubmitPatientPage() {
               <div className="flex items-center gap-2">
                 <CheckCircle2
                   className={`w-4 h-4 ${
-                    isDriveLinkProvided ? "text-emerald-500" : "text-slate-300"
+                    isLinkProvided ? "text-emerald-500" : "text-slate-300"
                   }`}
                 />
-                <span className={isDriveLinkProvided ? "text-slate-700 font-medium" : "text-slate-400"}>
-                  Google Drive link (optional)
+                <span className={isLinkProvided ? "text-slate-700 font-medium" : "text-slate-400"}>
+                  Documents ({formData.documentSource === "whatsapp" ? "WhatsApp" : "Google Drive"})
                 </span>
               </div>
             </div>
