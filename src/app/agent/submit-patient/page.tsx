@@ -19,6 +19,7 @@ import {
   ShieldCheck,
   FileCheck,
   MessageSquare,
+  ExternalLink,
 } from "lucide-react";
 import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
@@ -146,7 +147,13 @@ export default function AgentSubmitPatientPage() {
       newErrors.symptoms = "Please provide more details about the symptoms (min 5 characters)";
     }
 
-    if (formData.link.trim() && formData.documentSource === "google_drive") {
+    if (!formData.link.trim()) {
+      if (formData.documentSource === "whatsapp") {
+        newErrors.link = "WhatsApp number is required (e.g. 017XXXXXXXX)";
+      } else {
+        newErrors.link = "Google Drive link is required (e.g. https://drive.google.com/...)";
+      }
+    } else if (formData.documentSource === "google_drive") {
       try {
         new URL(formData.link.trim());
       } catch {
@@ -168,6 +175,8 @@ export default function AgentSubmitPatientPage() {
 
     try {
       const cleanPhone = formData.phone.replace(/[\s\-()]/g, "");
+      const finalLink = formData.link.trim();
+
       const payload: {
         fullName: string;
         phone: string;
@@ -190,7 +199,7 @@ export default function AgentSubmitPatientPage() {
         budgetRange: formData.budgetRange.trim(),
         symptoms: formData.symptoms.trim(),
         documentSource: formData.documentSource,
-        link: formData.link.trim(),
+        link: finalLink,
       };
 
       if (formData.subAgentId && formData.subAgentId !== "direct") {
@@ -590,7 +599,11 @@ export default function AgentSubmitPatientPage() {
                   <button
                     type="button"
                     onClick={() =>
-                      setFormData((prev) => ({ ...prev, documentSource: "whatsapp" }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        documentSource: "whatsapp",
+                        link: prev.documentSource === "google_drive" ? "" : prev.link,
+                      }))
                     }
                     className={`py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
                       formData.documentSource === "whatsapp"
@@ -604,6 +617,36 @@ export default function AgentSubmitPatientPage() {
                 </div>
               </div>
 
+              {/* Direct WhatsApp Share Banner & Redirect Button */}
+              {formData.documentSource === "whatsapp" && (
+                <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200/90 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-2xs">
+                      <MessageSquare className="w-4 h-4" />
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xs font-bold text-emerald-950">
+                        Share Documents Directly on WhatsApp
+                      </h4>
+                      <p className="text-[11px] text-emerald-800 mt-0.5 leading-relaxed">
+                        Send patient prescriptions, test reports, or medical history directly to our 3S Medical Desk on WhatsApp.
+                      </p>
+                    </div>
+                  </div>
+
+                  <a
+                    href="https://wa.me/8801357071545?text=Hello%2C%20I%20want%20to%20share%20patient%20medical%20documents"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    <span>Chat on WhatsApp / Share Documents</span>
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                </div>
+              )}
+
               {/* Document Link Input */}
               <div className="space-y-1.5">
                 <label className="text-xs font-bold text-slate-700 flex items-center justify-between">
@@ -615,8 +658,7 @@ export default function AgentSubmitPatientPage() {
                     )}
                     <span>
                       {formData.documentSource === "whatsapp"
-                        ? "WhatsApp Link or Phone Number"
-                        : "Google Drive Folder Link"}
+                        ? "WhatsApp Number" : "Google Drive Folder Link"}
                     </span>
                   </span>
                   {errors.link && (
@@ -632,7 +674,7 @@ export default function AgentSubmitPatientPage() {
                   onChange={handleInputChange}
                   placeholder={
                     formData.documentSource === "whatsapp"
-                      ? "https://wa.me/8801700000000 or 01700000000"
+                      ? "e.g. 017XXXXXXXX"
                       : "https://drive.google.com/drive/folders/..."
                   }
                   className={`w-full px-4 py-2.5 rounded-xl border text-sm transition-all focus:outline-hidden focus:ring-2 ${
@@ -643,7 +685,7 @@ export default function AgentSubmitPatientPage() {
                 />
                 <p className="text-[11px] text-slate-400 leading-relaxed">
                   {formData.documentSource === "whatsapp"
-                    ? "Enter WhatsApp number or wa.me chat link where patient records are forwarded."
+                    ? "Enter the WhatsApp number from which you are sending documents, so our team can easily identify and match your files."
                     : "Make sure Google Drive link permissions are set to \"Anyone with the link can view\"."}
                 </p>
               </div>

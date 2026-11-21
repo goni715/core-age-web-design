@@ -15,16 +15,29 @@ import {
   ExternalLink,
   Loader2,
   RefreshCw,
+  Edit3,
+  X,
 } from "lucide-react";
 import TkIcon from "@/components/icons/TkIcon";
 import { Card } from "@/components/ui/card";
-import { useGetMyProfileQuery } from "@/redux/features/user/userApi";
-import { SuccessToast } from "@/helpers/ValidationHelper";
+import {
+  useGetMyProfileQuery,
+  useUpdateAgentProfileMutation,
+} from "@/redux/features/user/userApi";
+import { ErrorToast, SuccessToast } from "@/helpers/ValidationHelper";
 import { getUserInfo } from "@/helpers/SessionHelper";
 
 export default function AgentProfilePage() {
   const { data: profileResponse, isLoading, isError, refetch, isFetching } =
     useGetMyProfileQuery();
+  const [updateAgentProfile, { isLoading: isUpdating }] =
+    useUpdateAgentProfileMutation();
+
+  const [isEditOpen, setIsEditOpen] = React.useState(false);
+  const [formData, setFormData] = React.useState({
+    fullName: "",
+    agencyName: "",
+  });
 
   const sessionUser = typeof window !== "undefined" ? getUserInfo() : null;
   const profile = profileResponse?.data || (sessionUser && sessionUser.fullName ? {
@@ -37,6 +50,36 @@ export default function AgentProfilePage() {
     approvalStatus: "approved",
     createdAt: new Date().toISOString(),
   } : undefined);
+
+  const handleOpenEdit = () => {
+    setFormData({
+      fullName: profile?.fullName || "",
+      agencyName: profile?.agencyName || "",
+    });
+    setIsEditOpen(true);
+  };
+
+  const handleUpdate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload: { fullName?: string; agencyName?: string } = {};
+    if (formData.fullName.trim()) payload.fullName = formData.fullName.trim();
+    if (formData.agencyName.trim()) payload.agencyName = formData.agencyName.trim();
+
+    if (!payload.fullName && !payload.agencyName) {
+      ErrorToast("Please enter Full Name or Agency Name");
+      return;
+    }
+
+    try {
+      const res = await updateAgentProfile(payload).unwrap();
+      if (res?.success) {
+        setIsEditOpen(false);
+        refetch();
+      }
+    } catch {
+      // Toast handled by mutation onQueryStarted
+    }
+  };
 
   const formatDate = (isoString?: string) => {
     if (!isoString) return "—";
@@ -177,9 +220,19 @@ export default function AgentProfilePage() {
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
                   {profile.agencyName || "Channel Partner Agency"}
                 </p>
-                <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
-                  <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
-                  <span>Channel Partner</span>
+                <div className="mt-2.5 flex items-center justify-center gap-2 flex-wrap">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200/70">
+                    <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                    <span>Channel Partner</span>
+                  </span>
+                  <button
+                    onClick={handleOpenEdit}
+                    className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 transition-colors cursor-pointer"
+                    title="Edit profile information"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit Profile</span>
+                  </button>
                 </div>
               </div>
 
@@ -263,6 +316,13 @@ export default function AgentProfilePage() {
                     </p>
                   </div>
                 </div>
+                <button
+                  onClick={handleOpenEdit}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200/80 transition-colors cursor-pointer"
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Edit Details</span>
+                </button>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -449,6 +509,114 @@ export default function AgentProfilePage() {
                 </div>
               </div>
             </Card>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Profile Modal */}
+      {isEditOpen && profile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-100 bg-blue-50/40">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center">
+                  <Edit3 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base">Edit Partner Profile</h3>
+                  <p className="text-xs text-slate-500">Update your full name and agency credentials</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsEditOpen(false)}
+                disabled={isUpdating}
+                className="w-8 h-8 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-white flex items-center justify-center transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Form */}
+            <form onSubmit={handleUpdate} className="p-6 space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={formData.fullName}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, fullName: e.target.value }))
+                    }
+                    placeholder="Enter your full name"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-900"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">
+                  Agency Name
+                </label>
+                <div className="relative">
+                  <Building2 className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                  <input
+                    type="text"
+                    value={formData.agencyName}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, agencyName: e.target.value }))
+                    }
+                    placeholder="Enter registered agency name"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 text-sm focus:outline-hidden focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all font-medium text-slate-900"
+                  />
+                </div>
+              </div>
+
+              {/* Read only info notice */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-500 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Email:</span>
+                  <span className="font-semibold text-slate-700">{profile.email || "—"}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Phone:</span>
+                  <span className="font-semibold text-slate-700">{profile.phone || "—"}</span>
+                </div>
+                <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-200/60 mt-1">
+                  * Note: Phone number & email address cannot be changed directly.
+                </p>
+              </div>
+
+              {/* Action buttons */}
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setIsEditOpen(false)}
+                  disabled={isUpdating}
+                  className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isUpdating}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm disabled:opacity-60 cursor-pointer"
+                >
+                  {isUpdating ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Saving...</span>
+                    </>
+                  ) : (
+                    <span>Save Changes</span>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

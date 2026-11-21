@@ -207,6 +207,74 @@ export const userApi = apiSlice.injectEndpoints({
         }
       },
     }),
+
+    updateAgentProfile: builder.mutation<
+      IAgentProfileResponse,
+      { fullName?: string; agencyName?: string }
+    >({
+      query: (data) => ({
+        url: "/user/update-agent-profile",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [TagTypes.PROFILE, TagTypes.USERS],
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const res = await queryFulfilled;
+          const updated = res?.data?.data;
+          const existing = getUserInfo();
+          if (existing) {
+            setUserInfo({
+              ...existing,
+              fullName: updated?.fullName || arg.fullName || existing.fullName,
+              agencyName:
+                updated?.agencyName || arg.agencyName || existing.agencyName,
+            });
+          }
+          SuccessToast(res?.data?.message || "Profile updated successfully");
+        } catch (err: any) {
+          const message =
+            err?.error?.data?.message ||
+            err?.error?.data?.error ||
+            "Failed to update profile";
+          ErrorToast(message);
+        }
+      },
+    }),
+
+    updateSubAgentProfile: builder.mutation<
+      ISubAgentProfileResponse,
+      { fullName?: string; agencyName?: string }
+    >({
+      query: (data) => ({
+        url: "/user/update-sub-agent-profile",
+        method: "PATCH",
+        body: data,
+      }),
+      invalidatesTags: [TagTypes.PROFILE, TagTypes.USERS],
+      async onQueryStarted(arg, { queryFulfilled }) {
+        try {
+          const res = await queryFulfilled;
+          const updated = res?.data?.data;
+          const existing = getUserInfo();
+          if (existing) {
+            setUserInfo({
+              ...existing,
+              fullName: updated?.fullName || arg.fullName || existing.fullName,
+              agencyName:
+                updated?.agencyName || arg.agencyName || existing.agencyName,
+            });
+          }
+          SuccessToast(res?.data?.message || "Profile updated successfully");
+        } catch (err: any) {
+          const message =
+            err?.error?.data?.message ||
+            err?.error?.data?.error ||
+            "Failed to update profile";
+          ErrorToast(message);
+        }
+      },
+    }),
   }),
 });
 
@@ -218,4 +286,6 @@ export const {
   useGetMyProfileQuery,
   useGetSubAgentProfileQuery,
   useUpdateProfileMutation,
+  useUpdateAgentProfileMutation,
+  useUpdateSubAgentProfileMutation,
 } = userApi;
